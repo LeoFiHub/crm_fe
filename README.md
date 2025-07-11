@@ -1,4 +1,4 @@
-# CRM Frontend Application
+# LeoLab CRM Frontend Application
 
 Ứng dụng CRM (Customer Relationship Management) được xây dựng với React.js, Tailwind CSS và React Router.
 
@@ -132,7 +132,9 @@ This project is licensed under the MIT License.
 
 - Frontend Developer: Sử dụng modern React patterns và best practices
 - UI/UX Design: Dựa trên Figma design specifications
-- Responsive Design: Mobile-first approach với Tailwind CSS+ Vite
+- Responsive Design: Mobile-first approach với Tailwind CSS
+
+## Vite + React Template
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
