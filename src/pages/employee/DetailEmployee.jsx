@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import Sidebar from '../components/Sidebar';
-import Header from '../components/Header';
-import { ProfileEmp } from '../components/ProfileEmp';
+import Sidebar from '../../components/Sidebar';
+import Header from '../../components/Header';
+import { ProfileEmp } from '../../components/employee/ProfileEmp';
 
 const DetailEmployee = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);

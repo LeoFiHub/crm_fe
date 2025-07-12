@@ -1,12 +1,11 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import AllEmployees from './pages/AllEmployees';
+import AllEmployees from './pages/employee/AllEmployees';
 import './App.css';
-import AddEmployee from './pages/AddEmployee';
-import DetailEmployee from './pages/DetailEmployee';
+import AddEmployee from './pages/employee/AddEmployee';
+import DetailEmployee from './pages/employee/DetailEmployee';
 
 function App() {
   return (

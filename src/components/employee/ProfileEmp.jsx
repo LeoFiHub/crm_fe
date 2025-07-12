@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { User, Calendar, FolderOpen, FileText, Edit, Briefcase } from 'lucide-react';
 
 export const ProfileEmp = ({ employeeData }) => {
