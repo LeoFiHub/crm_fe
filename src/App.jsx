@@ -6,6 +6,7 @@ import AllEmployees from './pages/employee/AllEmployees';
 import './App.css';
 import AddEmployee from './pages/employee/AddEmployee';
 import DetailEmployee from './pages/employee/DetailEmployee';
+import PayrollList from './pages/payroll/payrollList';
 
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
           <Route path="employees/detail" element={<DetailEmployee />} />
 
           {/* Payroll for Finance role */}
-          <Route path="payroll" element={<AddEmployee />} />
+          <Route path="payroll" element={<PayrollList />} />
 
         </Route>
       </Routes>
