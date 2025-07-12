@@ -43,12 +43,12 @@ const EmployeeTable = () => {
                 cell: ({ row }) => (
                     <div className="flex items-center gap-2.5 min-w-0">
                         <img
-                            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover flex-shrink-0"
+                            className="flex-shrink-0 object-cover w-8 h-8 rounded-full sm:w-9 sm:h-9"
                             src={row.original.avatar}
                             alt={row.original.name}
                             loading="lazy"
                         />
-                        <span className="text-zinc-900 text-sm sm:text-base font-light font-lexend truncate">
+                        <span className="text-sm font-light truncate text-zinc-900 sm:text-base font-lexend">
                             {row.original.name}
                         </span>
                     </div>
@@ -59,7 +59,7 @@ const EmployeeTable = () => {
                 accessorKey: 'phone',
                 header: 'Phone',
                 cell: ({ getValue }) => (
-                    <span className="text-zinc-900 text-sm sm:text-base font-light font-lexend">
+                    <span className="text-sm font-light text-zinc-900 sm:text-base font-lexend">
                         {getValue()}
                     </span>
                 ),
@@ -69,7 +69,7 @@ const EmployeeTable = () => {
                 accessorKey: 'department',
                 header: 'Department',
                 cell: ({ getValue }) => (
-                    <span className="text-zinc-900 text-sm sm:text-base font-light font-lexend">
+                    <span className="text-sm font-light text-zinc-900 sm:text-base font-lexend">
                         {getValue()}
                     </span>
                 ),
@@ -79,7 +79,7 @@ const EmployeeTable = () => {
                 accessorKey: 'designation',
                 header: 'Designation',
                 cell: ({ getValue }) => (
-                    <span className="text-zinc-900 text-sm sm:text-base font-light font-lexend">
+                    <span className="text-sm font-light text-zinc-900 sm:text-base font-lexend">
                         {getValue()}
                     </span>
                 ),
@@ -89,7 +89,7 @@ const EmployeeTable = () => {
                 accessorKey: 'type',
                 header: 'Type',
                 cell: ({ getValue }) => (
-                    <span className="text-zinc-900 text-sm sm:text-base font-light font-lexend">
+                    <span className="text-sm font-light text-zinc-900 sm:text-base font-lexend">
                         {getValue()}
                     </span>
                 ),
@@ -112,13 +112,13 @@ const EmployeeTable = () => {
                 enableColumnFilter: false,
                 cell: () => (
                     <div className="flex gap-1 sm:gap-2.5">
-                        <button className="w-6 h-6 sm:w-8 sm:h-8 hover:bg-gray-100 rounded flex items-center justify-center">
+                        <button className="flex items-center justify-center w-6 h-6 rounded sm:w-8 sm:h-8 hover:bg-gray-100">
                             <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-900" />
                         </button>
-                        <button className="w-6 h-6 sm:w-8 sm:h-8 hover:bg-gray-100 rounded flex items-center justify-center">
+                        <button className="flex items-center justify-center w-6 h-6 rounded sm:w-8 sm:h-8 hover:bg-gray-100">
                             <Edit className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-900" />
                         </button>
-                        <button className="w-6 h-6 sm:w-8 sm:h-8 hover:bg-gray-100 rounded flex items-center justify-center">
+                        <button className="flex items-center justify-center w-6 h-6 rounded sm:w-8 sm:h-8 hover:bg-gray-100">
                             <Trash2 className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-900" />
                         </button>
                     </div>
@@ -145,23 +145,45 @@ const EmployeeTable = () => {
         },
     });
 
+    // =========================== Handlers =========================
+
     return (
-        <div className="w-full bg-white overflow-hidden p-3 sm:p-4">
-            {/* Search Input */}
-            <div className="mb-4">
-                <input
-                    type="text"
-                    value={globalFilter ?? ''}
-                    onChange={e => setGlobalFilter(e.target.value)}
-                    placeholder="Search employees..."
-                    className="w-full max-w-xs h-10 px-3 rounded-[10px] border border-zinc-400/20 text-zinc-900 text-sm font-light font-lexend"
-                />
+        <div className="w-full p-3 overflow-hidden bg-white sm:p-4">
+            <div className="flex items-center justify-between mb-4">
+                {/* Search Input */}
+                <div className="mb-4">
+                    <input
+                        type="text"
+                        value={globalFilter ?? ''}
+                        onChange={e => setGlobalFilter(e.target.value)}
+                        placeholder="Search employees..."
+                        className="w-full max-w-xs h-10 px-3 rounded-[10px] border border-zinc-400/20 text-zinc-900 text-sm font-light font-lexend"
+                    />
+                </div>
+                <div className="flex items-center justify-center mb-4 fy-ce">
+
+                    {/* Search filter */}
+                    <div data-size="Large" data-state="Icon+Button Auto Width" data-type="Fill" className="w-28 h-12 p-5 rounded-[10px] outline outline-1 outline-offset-[-1px] outline-zinc-400/20 inline-flex justify-center items-center gap-2.5">
+                        <div className="relative w-6 h-6 overflow-hidden">
+                            <div className="w-1.5 h-0 left-[3px] top-[6px] absolute rounded-md outline outline-[1.50px] outline-offset-[-0.75px] outline-zinc-900" />
+                            <div className="w-2 h-0 left-[3px] top-[12px] absolute rounded-md outline outline-[1.50px] outline-offset-[-0.75px] outline-zinc-900" />
+                            <div className="w-0.5 h-0 left-[19px] top-[12px] absolute rounded-md outline outline-[1.50px] outline-offset-[-0.75px] outline-zinc-900" />
+                            <div className="w-1.5 h-0 left-[14px] top-[6px] absolute rounded-md outline outline-[1.50px] outline-offset-[-0.75px] outline-zinc-900" />
+                            <div className="w-1.5 h-0 left-[13px] top-[18px] absolute rounded-md outline outline-[1.50px] outline-offset-[-0.75px] outline-zinc-900" />
+                            <div className="w-[3px] h-0 left-[3px] top-[18px] absolute rounded-md outline outline-[1.50px] outline-offset-[-0.75px] outline-zinc-900" />
+                            <div className="w-1 h-1 left-[6px] top-[16px] absolute rounded-full outline outline-[1.50px] outline-offset-[-0.75px] outline-zinc-900" />
+                            <div className="w-1 h-1 left-[15px] top-[10px] absolute rounded-full outline outline-[1.50px] outline-offset-[-0.75px] outline-zinc-900" />
+                            <div className="w-1 h-1 left-[10px] top-[4px] absolute rounded-full outline outline-[1.50px] outline-offset-[-0.75px] outline-zinc-900" />
+                        </div>
+                        <div className="justify-start text-zinc-900 text-base font-light font-['Lexend'] leading-normal">Filter</div>
+                    </div>
+                </div>
             </div>
 
             {/* Table Container - Horizontal scroll on mobile */}
             <div className="overflow-x-auto">
                 <table className="w-full min-w-[640px]">
-                    <thead className="bg-zinc-400/5 border-b border-zinc-400/10">
+                    <thead className="border-b bg-zinc-400/5 border-zinc-400/10">
                         {table.getHeaderGroups().map(headerGroup => (
                             <tr key={headerGroup.id}>
                                 {headerGroup.headers.map((header, index) => (
@@ -207,9 +229,9 @@ const EmployeeTable = () => {
             </div>
 
             {/* Pagination Controls */}
-            <div className="flex flex-col sm:flex-row justify-between items-center mt-4 gap-4">
+            <div className="flex flex-col items-center justify-between gap-4 mt-4 sm:flex-row">
                 <div className="flex items-center gap-3 sm:gap-5">
-                    <span className="text-zinc-400 text-sm font-light font-lexend">Showing</span>
+                    <span className="text-sm font-light text-zinc-400 font-lexend">Showing</span>
                     <div className="relative">
                         <select
                             value={table.getState().pagination.pageSize}
@@ -222,11 +244,11 @@ const EmployeeTable = () => {
                                 </option>
                             ))}
                         </select>
-                        <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 absolute right-1 sm:right-2 top-2 sm:top-3 text-zinc-900 pointer-events-none" />
+                        <ChevronDown className="absolute w-4 h-4 pointer-events-none sm:w-5 sm:h-5 right-1 sm:right-2 top-2 sm:top-3 text-zinc-900" />
                     </div>
                 </div>
 
-                <span className="text-zinc-400 text-xs sm:text-sm font-light font-lexend text-center">
+                <span className="text-xs font-light text-center text-zinc-400 sm:text-sm font-lexend">
                     Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to{' '}
                     {Math.min(
                         (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
@@ -237,7 +259,7 @@ const EmployeeTable = () => {
 
                 <div className="flex gap-2">
                     <button
-                        className="p-2 hover:bg-gray-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-2 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={() => table.previousPage()}
                         disabled={!table.getCanPreviousPage()}
                     >
@@ -254,7 +276,7 @@ const EmployeeTable = () => {
                         </svg>
                     </button>
                     <button
-                        className="p-2 hover:bg-gray-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-2 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={() => table.nextPage()}
                         disabled={!table.getCanNextPage()}
                     >

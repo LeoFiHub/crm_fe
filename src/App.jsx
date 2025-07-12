@@ -5,6 +5,8 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import AllEmployees from './pages/AllEmployees';
 import './App.css';
+import AddEmployee from './pages/AddEmployee';
+import DetailEmployee from './pages/DetailEmployee';
 
 function App() {
   return (
@@ -15,6 +17,12 @@ function App() {
           <Route path="login" element={<Login />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="employees" element={<AllEmployees />} />
+          <Route path="employees/add" element={<AddEmployee />} />
+          <Route path="employees/detail" element={<DetailEmployee />} />
+
+          {/* Payroll for Finance role */}
+          <Route path="payroll" element={<AddEmployee />} />
+
         </Route>
       </Routes>
     </Router>

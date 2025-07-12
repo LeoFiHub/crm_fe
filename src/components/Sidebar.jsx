@@ -44,7 +44,10 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     };
 
     const MenuItem = ({ icon: Icon, label, path }) => {
-        const isActive = location.pathname === path;
+        // Check if current path matches exactly or starts with the menu path (for sub-routes)
+        const isActive = path === '/employees'
+            ? location.pathname.startsWith('/employees')
+            : location.pathname === path;
 
         return (
             <div className="relative">
