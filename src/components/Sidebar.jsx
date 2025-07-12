@@ -11,6 +11,7 @@ import {
     FileText,
     Calendar,
     Settings,
+    Coins,
     Sun,
     Moon,
     X,
@@ -25,14 +26,17 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     const menuItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
         { icon: Users, label: 'All Employees', path: '/employees' },
-        { icon: Building2, label: 'All Departments', path: '/departments' },
-        { icon: Clock, label: 'Attendance', path: '/attendance' },
         { icon: DollarSign, label: 'Payroll', path: '/payroll' },
-        { icon: Briefcase, label: 'Jobs', path: '/jobs' },
-        { icon: UserCheck, label: 'Candidates', path: '/candidates' },
-        { icon: FileText, label: 'Leaves', path: '/leaves' },
-        { icon: Calendar, label: 'Holidays', path: '/holidays' },
-        { icon: Settings, label: 'Settings', path: '/settings' },
+        // UI Finance role, deposit
+        { icon: Coins, label: 'Deposit', path: '/deposit' },
+        
+        // { icon: Building2, label: 'All Departments', path: '/departments' },
+        // { icon: Clock, label: 'Attendance', path: '/attendance' },
+        // { icon: Briefcase, label: 'Jobs', path: '/jobs' },
+        // { icon: UserCheck, label: 'Candidates', path: '/candidates' },
+        // { icon: FileText, label: 'Leaves', path: '/leaves' },
+        // { icon: Calendar, label: 'Holidays', path: '/holidays' },
+        // { icon: Settings, label: 'Settings', path: '/settings' },
     ];
 
     const handleMenuClick = (path) => {

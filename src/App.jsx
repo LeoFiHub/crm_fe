@@ -7,6 +7,7 @@ import './App.css';
 import AddEmployee from './pages/employee/AddEmployee';
 import DetailEmployee from './pages/employee/DetailEmployee';
 import PayrollList from './pages/payroll/payrollList';
+import DepositCoinsPage from './pages/deposit/DepositCoinsPage';
 
 function App() {
   return (
@@ -14,8 +15,12 @@ function App() {
       <Routes>
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Navigate to="/login" replace />} />
+            {/* Auth */}
           <Route path="login" element={<Login />} />
+          
           <Route path="dashboard" element={<Dashboard />} />
+          
+          {/* Employee Management */}
           <Route path="employees" element={<AllEmployees />} />
           <Route path="employees/add" element={<AddEmployee />} />
           <Route path="employees/detail" element={<DetailEmployee />} />
@@ -23,6 +28,10 @@ function App() {
           {/* Payroll for Finance role */}
           <Route path="payroll" element={<PayrollList />} />
 
+          {/* Deposit for Finance role */}
+          <Route path="deposit" element={<DepositCoinsPage />} />
+          
+          {/* Add other routes as needed */}
         </Route>
       </Routes>
     </Router>
