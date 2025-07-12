@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import ScheduleCalendar from '../components/ScheduleCalendar';
 import { Users, Building2, Clock, TrendingUp } from 'lucide-react';
 
 const Dashboard = () => {
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+
     const stats = [
         {
             title: "Total Employees",
@@ -43,105 +45,145 @@ const Dashboard = () => {
     const StatCard = ({ title, value, change, changeType, icon, color }) => {
         const Icon = icon;
         return (
-            <div className="bg-white rounded-lg border border-zinc-400/20 p-6">
+            <div className="p-4 bg-white border rounded-lg border-zinc-400/20 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
-                    <div className={`w-12 h-12 ${color} rounded-lg flex items-center justify-center`}>
-                        <Icon className="w-6 h-6 text-white" />
+                    <div className={`w-10 h-10 sm:w-12 sm:h-12 ${color} rounded-lg flex items-center justify-center`}>
+                        <Icon className="w-5 h-5 text-white sm:w-6 sm:h-6" />
                     </div>
-                    <span className={`text-sm font-medium ${changeType === 'positive' ? 'text-green-600' :
-                            changeType === 'negative' ? 'text-red-600' : 'text-gray-600'
+                    <span className={`text-xs sm:text-sm font-medium px-2 py-1 rounded-full ${changeType === 'positive' ? 'text-green-600 bg-green-100' :
+                        changeType === 'negative' ? 'text-red-600 bg-red-100' :
+                            'text-gray-600 bg-gray-100'
                         }`}>
                         {change}
                     </span>
                 </div>
-                <div className="space-y-1">
-                    <p className="text-sm text-zinc-400 font-light font-lexend">{title}</p>
-                    <p className="text-2xl font-semibold text-zinc-900 font-lexend">{value}</p>
+                <div>
+                    <p className="mb-1 text-2xl font-bold sm:text-3xl text-zinc-900 font-lexend">{value}</p>
+                    <p className="text-sm sm:text-base text-zinc-400 font-lexend">{title}</p>
                 </div>
             </div>
         );
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
+        <div className="min-h-screen bg-gray-50 lg:flex">
             {/* Sidebar */}
-            <div className="fixed left-0 top-0 z-30">
-                <Sidebar />
-            </div>
+            <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
 
             {/* Main Content */}
-            <div className="flex-1 ml-72">
-                <div className="p-6">
+            <div className="flex-1 lg:ml-0">
+                <div className="flex flex-col">
                     {/* Header */}
-                    <Header />
+                    <Header onMenuClick={() => setSidebarOpen(true)} />
 
                     {/* Content Area */}
-                    <div className="mt-8">
+                    <div className="flex-1 p-4 sm:p-6">
                         {/* Page Title */}
-                        <div className="mb-8">
-                            <h1 className="text-3xl font-bold text-zinc-900 font-lexend mb-2">
+                        <div className="mb-6 sm:mb-8">
+                            <h1 className="mb-2 text-2xl font-bold sm:text-3xl text-zinc-900 font-lexend">
                                 Dashboard
                             </h1>
-                            <p className="text-zinc-400 font-light font-lexend">
+                            <p className="font-light text-zinc-400 font-lexend">
                                 Welcome back! Here's what's happening at your company today.
                             </p>
                         </div>
 
                         {/* Stats Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div className="grid grid-cols-1 gap-4 mb-6 sm:grid-cols-2 xl:grid-cols-4 sm:gap-6 sm:mb-8">
                             {stats.map((stat, index) => (
                                 <StatCard key={index} {...stat} />
                             ))}
                         </div>
 
-                        {/* Content Grid */}
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            {/* Recent Activity */}
-                            <div className="lg:col-span-2">
-                                <div className="bg-white rounded-lg border border-zinc-400/20 p-6">
-                                    <h3 className="text-xl font-semibold text-zinc-900 font-lexend mb-6">
+                        {/* Main Content Grid */}
+                        <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+                            {/* Quick Actions & Recent Activity */}
+                            <div className="space-y-6 xl:col-span-2">
+                                {/* Quick Actions */}
+                                <div className="p-4 bg-white border rounded-lg border-zinc-400/20 sm:p-6">
+                                    <h3 className="mb-4 text-lg font-semibold sm:text-xl text-zinc-900 font-lexend">
+                                        Quick Actions
+                                    </h3>
+                                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                        <button className="flex items-center gap-3 p-4 transition-colors border rounded-lg border-zinc-400/20 hover:bg-gray-50">
+                                            <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-lg">
+                                                <Users className="w-5 h-5 text-blue-600" />
+                                            </div>
+                                            <div className="text-left">
+                                                <p className="text-sm font-medium text-zinc-900 font-lexend sm:text-base">Add Employee</p>
+                                                <p className="text-xs sm:text-sm text-zinc-400 font-lexend">Register new team member</p>
+                                            </div>
+                                        </button>
+
+                                        <button className="flex items-center gap-3 p-4 transition-colors border rounded-lg border-zinc-400/20 hover:bg-gray-50">
+                                            <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-lg">
+                                                <Building2 className="w-5 h-5 text-green-600" />
+                                            </div>
+                                            <div className="text-left">
+                                                <p className="text-sm font-medium text-zinc-900 font-lexend sm:text-base">Create Department</p>
+                                                <p className="text-xs sm:text-sm text-zinc-400 font-lexend">Set up new department</p>
+                                            </div>
+                                        </button>
+
+                                        <button className="flex items-center gap-3 p-4 transition-colors border rounded-lg border-zinc-400/20 hover:bg-gray-50 sm:col-span-2 lg:col-span-1">
+                                            <div className="flex items-center justify-center w-10 h-10 bg-purple-100 rounded-lg">
+                                                <Clock className="w-5 h-5 text-purple-600" />
+                                            </div>
+                                            <div className="text-left">
+                                                <p className="text-sm font-medium text-zinc-900 font-lexend sm:text-base">Mark Attendance</p>
+                                                <p className="text-xs sm:text-sm text-zinc-400 font-lexend">Record daily attendance</p>
+                                            </div>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Recent Activity */}
+                                <div className="p-4 bg-white border rounded-lg border-zinc-400/20 sm:p-6">
+                                    <h3 className="mb-4 text-lg font-semibold sm:text-xl text-zinc-900 font-lexend">
                                         Recent Activity
                                     </h3>
                                     <div className="space-y-4">
-                                        <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
-                                            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                                <Users className="w-5 h-5 text-blue-600" />
+                                        <div className="flex items-center gap-4 p-3 rounded-lg bg-gray-50">
+                                            <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full">
+                                                <Users className="w-5 h-5 text-green-600" />
                                             </div>
-                                            <div className="flex-1">
-                                                <p className="font-medium text-zinc-900 font-lexend">New employee joined</p>
-                                                <p className="text-sm text-zinc-400 font-lexend">Sarah Johnson joined the Marketing team</p>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-medium truncate text-zinc-900 font-lexend sm:text-base">New employee joined</p>
+                                                <p className="text-xs sm:text-sm text-zinc-400 font-lexend">Sarah Johnson joined the Marketing team</p>
                                             </div>
-                                            <span className="text-xs text-zinc-400">2 hours ago</span>
+                                            <span className="text-xs text-zinc-400 whitespace-nowrap">2 hours ago</span>
                                         </div>
 
-                                        <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
-                                            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                                                <Clock className="w-5 h-5 text-green-600" />
+                                        <div className="flex items-center gap-4 p-3 rounded-lg bg-gray-50">
+                                            <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full">
+                                                <Clock className="w-5 h-5 text-blue-600" />
                                             </div>
-                                            <div className="flex-1">
-                                                <p className="font-medium text-zinc-900 font-lexend">Attendance updated</p>
-                                                <p className="text-sm text-zinc-400 font-lexend">Monthly attendance report generated</p>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-medium truncate text-zinc-900 font-lexend sm:text-base">Attendance updated</p>
+                                                <p className="text-xs sm:text-sm text-zinc-400 font-lexend">Monthly attendance report generated</p>
                                             </div>
-                                            <span className="text-xs text-zinc-400">4 hours ago</span>
+                                            <span className="text-xs text-zinc-400 whitespace-nowrap">4 hours ago</span>
                                         </div>
 
-                                        <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
-                                            <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                                        <div className="flex items-center gap-4 p-3 rounded-lg bg-gray-50">
+                                            <div className="flex items-center justify-center w-10 h-10 bg-purple-100 rounded-full">
                                                 <Building2 className="w-5 h-5 text-purple-600" />
                                             </div>
-                                            <div className="flex-1">
-                                                <p className="font-medium text-zinc-900 font-lexend">Department restructure</p>
-                                                <p className="text-sm text-zinc-400 font-lexend">IT Department expanded with 5 new roles</p>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-medium truncate text-zinc-900 font-lexend sm:text-base">Department restructure</p>
+                                                <p className="text-xs sm:text-sm text-zinc-400 font-lexend">IT Department expanded with 5 new roles</p>
                                             </div>
-                                            <span className="text-xs text-zinc-400">1 day ago</span>
+                                            <span className="text-xs text-zinc-400 whitespace-nowrap">1 day ago</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Schedule Calendar */}
-                            <div className="lg:col-span-1">
-                                <ScheduleCalendar />
+                            <div className="xl:col-span-1">
+                                <div className="sticky top-6">
+                                    <ScheduleCalendar />
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -41,14 +41,16 @@ const EmployeeTable = () => {
                 accessorKey: 'name',
                 header: 'Employee Name',
                 cell: ({ row }) => (
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex items-center gap-2.5 min-w-0">
                         <img
-                            className="w-9 h-9 rounded-full object-cover"
+                            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover flex-shrink-0"
                             src={row.original.avatar}
                             alt={row.original.name}
-                            loading="lazy" // Optimize image loading
+                            loading="lazy"
                         />
-                        <span className="text-zinc-900 text-base font-light font-lexend">{row.original.name}</span>
+                        <span className="text-zinc-900 text-sm sm:text-base font-light font-lexend truncate">
+                            {row.original.name}
+                        </span>
                     </div>
                 ),
                 filterFn: 'includesString',
@@ -57,7 +59,9 @@ const EmployeeTable = () => {
                 accessorKey: 'phone',
                 header: 'Phone',
                 cell: ({ getValue }) => (
-                    <span className="text-zinc-900 text-base font-light font-lexend hidden md:table-cell">{getValue()}</span>
+                    <span className="text-zinc-900 text-sm sm:text-base font-light font-lexend">
+                        {getValue()}
+                    </span>
                 ),
                 filterFn: 'includesString',
             },
@@ -65,7 +69,9 @@ const EmployeeTable = () => {
                 accessorKey: 'department',
                 header: 'Department',
                 cell: ({ getValue }) => (
-                    <span className="text-zinc-900 text-base font-light font-lexend hidden lg:table-cell">{getValue()}</span>
+                    <span className="text-zinc-900 text-sm sm:text-base font-light font-lexend">
+                        {getValue()}
+                    </span>
                 ),
                 filterFn: 'includesString',
             },
@@ -73,7 +79,9 @@ const EmployeeTable = () => {
                 accessorKey: 'designation',
                 header: 'Designation',
                 cell: ({ getValue }) => (
-                    <span className="text-zinc-900 text-base font-light font-lexend hidden xl:table-cell">{getValue()}</span>
+                    <span className="text-zinc-900 text-sm sm:text-base font-light font-lexend">
+                        {getValue()}
+                    </span>
                 ),
                 filterFn: 'includesString',
             },
@@ -81,7 +89,9 @@ const EmployeeTable = () => {
                 accessorKey: 'type',
                 header: 'Type',
                 cell: ({ getValue }) => (
-                    <span className="text-zinc-900 text-base font-light font-lexend hidden lg:table-cell">{getValue()}</span>
+                    <span className="text-zinc-900 text-sm sm:text-base font-light font-lexend">
+                        {getValue()}
+                    </span>
                 ),
                 filterFn: 'includesString',
             },
@@ -89,7 +99,7 @@ const EmployeeTable = () => {
                 accessorKey: 'status',
                 header: 'Status',
                 cell: ({ getValue }) => (
-                    <div className="px-2 py-[3px] bg-indigo-500/10 rounded text-indigo-500 text-xs font-light font-lexend">
+                    <div className="px-2 py-[3px] bg-indigo-500/10 rounded text-indigo-500 text-xs font-light font-lexend inline-block">
                         {getValue()}
                     </div>
                 ),
@@ -101,15 +111,15 @@ const EmployeeTable = () => {
                 enableSorting: false,
                 enableColumnFilter: false,
                 cell: () => (
-                    <div className="flex gap-2.5">
-                        <button className="w-6 h-6 hover:bg-gray-100 rounded">
-                            <Eye className="w-6 h-6 text-zinc-900" />
+                    <div className="flex gap-1 sm:gap-2.5">
+                        <button className="w-6 h-6 sm:w-8 sm:h-8 hover:bg-gray-100 rounded flex items-center justify-center">
+                            <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-900" />
                         </button>
-                        <button className="w-6 h-6 hover:bg-gray-100 rounded">
-                            <Edit className="w-6 h-6 text-zinc-900" />
+                        <button className="w-6 h-6 sm:w-8 sm:h-8 hover:bg-gray-100 rounded flex items-center justify-center">
+                            <Edit className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-900" />
                         </button>
-                        <button className="w-6 h-6 hover:bg-gray-100 rounded">
-                            <Trash2 className="w-6 h-6 text-zinc-900" />
+                        <button className="w-6 h-6 sm:w-8 sm:h-8 hover:bg-gray-100 rounded flex items-center justify-center">
+                            <Trash2 className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-900" />
                         </button>
                     </div>
                 ),
@@ -136,7 +146,7 @@ const EmployeeTable = () => {
     });
 
     return (
-        <div className="w-full bg-white overflow-hidden p-4">
+        <div className="w-full bg-white overflow-hidden p-3 sm:p-4">
             {/* Search Input */}
             <div className="mb-4">
                 <input
@@ -148,44 +158,63 @@ const EmployeeTable = () => {
                 />
             </div>
 
-            {/* Table */}
-            <table className="w-full">
-                <thead className="bg-zinc-400/5 border-b border-zinc-400/10">
-                    {table.getHeaderGroups().map(headerGroup => (
-                        <tr key={headerGroup.id}>
-                            {headerGroup.headers.map(header => (
-                                <th
-                                    key={header.id}
-                                    className="px-4 py-2.5 text-left text-zinc-900 text-base font-semibold font-lexend"
-                                >
-                                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                                </th>
-                            ))}
-                        </tr>
-                    ))}
-                </thead>
-                <tbody>
-                    {table.getRowModel().rows.map(row => (
-                        <tr key={row.id} className="border-b border-zinc-400/10 hover:bg-gray-50">
-                            {row.getVisibleCells().map(cell => (
-                                <td key={cell.id} className="px-4 py-2.5">
-                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                </td>
-                            ))}
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            {/* Table Container - Horizontal scroll on mobile */}
+            <div className="overflow-x-auto">
+                <table className="w-full min-w-[640px]">
+                    <thead className="bg-zinc-400/5 border-b border-zinc-400/10">
+                        {table.getHeaderGroups().map(headerGroup => (
+                            <tr key={headerGroup.id}>
+                                {headerGroup.headers.map((header, index) => (
+                                    <th
+                                        key={header.id}
+                                        className={`px-2 sm:px-4 py-2.5 text-left text-zinc-900 text-sm sm:text-base font-semibold font-lexend ${
+                                            // Hide columns on mobile based on priority
+                                            index === 1 ? 'hidden sm:table-cell' : // Phone
+                                                index === 2 ? 'hidden md:table-cell' : // Department  
+                                                    index === 3 ? 'hidden lg:table-cell' : // Designation
+                                                        index === 4 ? 'hidden md:table-cell' : // Type
+                                                            ''
+                                            }`}
+                                    >
+                                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                                    </th>
+                                ))}
+                            </tr>
+                        ))}
+                    </thead>
+                    <tbody>
+                        {table.getRowModel().rows.map(row => (
+                            <tr key={row.id} className="border-b border-zinc-400/10 hover:bg-gray-50">
+                                {row.getVisibleCells().map((cell, index) => (
+                                    <td
+                                        key={cell.id}
+                                        className={`px-2 sm:px-4 py-2.5 ${
+                                            // Hide columns on mobile based on priority
+                                            index === 1 ? 'hidden sm:table-cell' : // Phone
+                                                index === 2 ? 'hidden md:table-cell' : // Department
+                                                    index === 3 ? 'hidden lg:table-cell' : // Designation
+                                                        index === 4 ? 'hidden md:table-cell' : // Type
+                                                            ''
+                                            }`}
+                                    >
+                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                    </td>
+                                ))}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
 
             {/* Pagination Controls */}
-            <div className="flex justify-between items-center mt-4">
-                <div className="flex items-center gap-5">
+            <div className="flex flex-col sm:flex-row justify-between items-center mt-4 gap-4">
+                <div className="flex items-center gap-3 sm:gap-5">
                     <span className="text-zinc-400 text-sm font-light font-lexend">Showing</span>
                     <div className="relative">
                         <select
                             value={table.getState().pagination.pageSize}
                             onChange={e => table.setPageSize(Number(e.target.value))}
-                            className="w-20 h-11 bg-white rounded-[10px] border border-zinc-400/20 px-3 appearance-none"
+                            className="w-16 sm:w-20 h-9 sm:h-11 bg-white rounded-[10px] border border-zinc-400/20 px-2 sm:px-3 appearance-none text-sm"
                         >
                             {[10, 25, 50].map(pageSize => (
                                 <option key={pageSize} value={pageSize}>
@@ -193,10 +222,11 @@ const EmployeeTable = () => {
                                 </option>
                             ))}
                         </select>
-                        <ChevronDown className="w-5 h-5 absolute right-2 top-3 text-zinc-900 pointer-events-none" />
+                        <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 absolute right-1 sm:right-2 top-2 sm:top-3 text-zinc-900 pointer-events-none" />
                     </div>
                 </div>
-                <span className="text-zinc-400 text-sm font-light font-lexend">
+
+                <span className="text-zinc-400 text-xs sm:text-sm font-light font-lexend text-center">
                     Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to{' '}
                     {Math.min(
                         (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
@@ -204,14 +234,15 @@ const EmployeeTable = () => {
                     )}{' '}
                     of {data.length} records
                 </span>
-                <div className="flex gap-2.5">
+
+                <div className="flex gap-2">
                     <button
-                        className="p-2 hover:bg-gray-100 rounded"
+                        className="p-2 hover:bg-gray-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={() => table.previousPage()}
                         disabled={!table.getCanPreviousPage()}
                     >
                         <svg
-                            className="w-6 h-6 text-zinc-900"
+                            className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-900"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
@@ -223,12 +254,12 @@ const EmployeeTable = () => {
                         </svg>
                     </button>
                     <button
-                        className="p-2 hover:bg-gray-100 rounded"
+                        className="p-2 hover:bg-gray-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={() => table.nextPage()}
                         disabled={!table.getCanNextPage()}
                     >
                         <svg
-                            className="w-6 h-6 text-zinc-900"
+                            className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-900"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
