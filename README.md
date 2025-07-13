@@ -1,8 +1,8 @@
 # LeoLab CRM Frontend Application
 
-Ứng dụng CRM (Customer Relationship Management) được xây dựng với React.js, Tailwind CSS và React Router.
+Ứng dụng CRM (Customer Relationship Management) được xây dựng với React.js, Tailwind CSS và Ant design.
 
-## 🚀 Tính năng
+<!-- ## 🚀 Tính năng
 
 - **Trang đăng nhập** - Giao diện đăng nhập hiện đại với xác thực
 - **Dashboard** - Bảng điều khiển chính với:
@@ -11,16 +11,7 @@
   - Lịch công việc (My Schedule)
   - Header với search bar và thông tin user
 - **Responsive Design** - Tối ưu cho mọi thiết bị
-- **Theme System** - Hỗ trợ Light/Dark mode
-
-## 🛠️ Công nghệ sử dụng
-
-- **React.js** - Frontend framework
-- **Tailwind CSS** - Utility-first CSS framework
-- **React Router** - Client-side routing
-- **Lucide React** - Modern icon library
-- **Vite** - Build tool và dev server
-- **Font Lexend** - Typography từ Google Fonts
+- **Theme System** - Hỗ trợ Light/Dark mode -->
 
 ## 📦 Cài đặt
 
@@ -45,40 +36,17 @@ npm run dev
 
 4. Mở trình duyệt và truy cập: `http://localhost:5174`
 
-## 🎨 Color Scheme
-
-Dự án sử dụng bảng màu chủ đạo:
-
-- **Primary Colors**: Indigo palette (#6366f1)
-- **Secondary Colors**: Zinc/Gray palette
-- **Accent Colors**: Violet (#8b5cf6)
-
 ## 📁 Cấu trúc thư mục
 
 ```
 src/
-├── components/          # Reusable components
-│   ├── Sidebar.jsx     # Navigation sidebar
-│   ├── Header.jsx      # Top header bar
-│   ├── EmployeeTable.jsx # Employee data table
-│   ├── ScheduleCalendar.jsx # Calendar widget
-│   └── PageTemplate.jsx # Layout template
+├── api/                # API called logic 
+├── components/         # Reusable components
 ├── pages/              # Page components
-│   ├── Login.jsx       # Login page
-│   ├── Dashboard.jsx   # Main dashboard
-│   └── AllEmployees.jsx # Employee list page
 ├── layouts/            # Layout components
-│   └── MainLayout.jsx  # Main app layout
 ├── constants/          # App constants
-│   └── theme.js        # Color and theme constants
 └── assets/             # Static assets
 ```
-
-## 🔐 Authentication
-
-- Default login credentials:
-  - Email: `robertallen@example.com`
-  - Password: Any password (demo purposes)
 
 ## 🚧 Roadmap
 
@@ -126,23 +94,4 @@ src/
 
 ## 📄 License
 
-This project is licensed under the MIT License.
-
-## 👥 Team
-
-- Frontend Developer: Sử dụng modern React patterns và best practices
-- UI/UX Design: Dựa trên Figma design specifications
-- Responsive Design: Mobile-first approach với Tailwind CSS
-
-## Vite + React Template
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+This project is licensed under LeoLab.
