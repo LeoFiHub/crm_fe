@@ -1,9 +1,22 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, use, useEffect } from 'react';
 import { useReactTable, getCoreRowModel, getPaginationRowModel, getFilteredRowModel, flexRender } from '@tanstack/react-table';
 import { Eye, Edit, Trash2, ChevronDown } from 'lucide-react';
+import { getUsers } from '../../api/user';
 
 const EmployeeTable = () => {
     const [globalFilter, setGlobalFilter] = useState('');
+    const [user, setUser] = useState();
+
+
+    useEffect(() => {
+        getUsers()
+            .then(res => {
+                setUser(res.data);
+            })
+            .catch(error => {
+                console.error('Error fetching users:', error);
+            })
+    }, []);
 
     // Memoize the data to prevent unnecessary re-computation
     const data = useMemo(
