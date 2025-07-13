@@ -1,6 +1,4 @@
-import { useState } from 'react';
-import InputField from './InputField';
-import SelectField from './SelectField';
+import React, { useState } from 'react';
 import {
     User,
     Briefcase,
@@ -25,9 +23,9 @@ const TabsAddNewEmp = ({ onBack }) => {
         gender: '',
         nationality: '',
         address: '',
-        walletAddress: '',
-        salary: '',
-        payday: ''
+        city: '',
+        state: '',
+        zipCode: ''
     });
 
     const navigate = useNavigate();
@@ -47,20 +45,20 @@ const TabsAddNewEmp = ({ onBack }) => {
             completed: false,
             active: false
         },
-        // {
-        //     id: 2,
-        //     name: 'Documents',
-        //     icon: FileText,
-        //     completed: false,
-        //     active: false
-        // },
-        // {
-        //     id: 3,
-        //     name: 'Account Access',
-        //     icon: Key,
-        //     completed: false,
-        //     active: false
-        // }
+        {
+            id: 2,
+            name: 'Documents',
+            icon: FileText,
+            completed: false,
+            active: false
+        },
+        {
+            id: 3,
+            name: 'Account Access',
+            icon: Key,
+            completed: false,
+            active: false
+        }
     ];
 
     const handleInputChange = (field, value) => {
@@ -84,6 +82,37 @@ const TabsAddNewEmp = ({ onBack }) => {
         }
     };
 
+    const InputField = ({ label, value, onChange, placeholder, type = "text" }) => (
+        <div className="relative flex-1 h-14">
+            <input
+                type={type}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                placeholder={placeholder || label}
+                className="w-full h-full px-4 rounded-[10px] border border-zinc-400/20 text-base font-light font-lexend text-zinc-900 placeholder:text-zinc-400/80 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+            />
+        </div>
+    );
+
+    const SelectField = ({ label, value, onChange, options, placeholder }) => (
+        <div className="relative flex-1">
+            <select
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                className="w-full h-14 px-4 pr-10 rounded-[10px] border border-zinc-400/20 text-base font-light font-lexend text-zinc-900 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 appearance-none bg-white"
+            >
+                <option value="" disabled>{placeholder || label}</option>
+                {options.map((option) => (
+                    <option key={option.value} value={option.value}>
+                        {option.label}
+                    </option>
+                ))}
+            </select>
+            <div className="absolute transform -translate-y-1/2 pointer-events-none right-4 top-1/2">
+                <ChevronDown className="w-5 h-5 text-zinc-900" />
+            </div>
+        </div>
+    );
 
     const maritalStatusOptions = [
         { value: 'single', label: 'Single' },
@@ -105,6 +134,20 @@ const TabsAddNewEmp = ({ onBack }) => {
         { value: 'canadian', label: 'Canadian' },
         { value: 'australian', label: 'Australian' },
         { value: 'other', label: 'Other' }
+    ];
+
+    const cityOptions = [
+        { value: 'ho-chi-minh', label: 'Ho Chi Minh City' },
+        { value: 'hanoi', label: 'Hanoi' },
+        { value: 'da-nang', label: 'Da Nang' },
+        { value: 'can-tho', label: 'Can Tho' },
+        { value: 'other', label: 'Other' }
+    ];
+
+    const stateOptions = [
+        { value: 'south', label: 'South Vietnam' },
+        { value: 'north', label: 'North Vietnam' },
+        { value: 'central', label: 'Central Vietnam' }
     ];
 
     return (
@@ -247,46 +290,47 @@ const TabsAddNewEmp = ({ onBack }) => {
                             />
                         </div>
 
+                        {/* City, State, ZIP */}
+                        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+                            <SelectField
+                                label="City"
+                                value={formData.city}
+                                onChange={(value) => handleInputChange('city', value)}
+                                options={cityOptions}
+                                placeholder="City"
+                            />
+                            <SelectField
+                                label="State"
+                                value={formData.state}
+                                onChange={(value) => handleInputChange('state', value)}
+                                options={stateOptions}
+                                placeholder="State"
+                            />
+                            <InputField
+                                label="ZIP Code"
+                                value={formData.zipCode}
+                                onChange={(value) => handleInputChange('zipCode', value)}
+                                placeholder="ZIP Code"
+                            />
+                        </div>
                     </div>
                 </div>
             )}
 
             {/* Other tabs placeholder */}
             {activeTab === 1 && (
-                <div className="space-y-5">
-                    <InputField
-                        label="Wallet Address"
-                        value={formData.walletAddress || ''}
-                        onChange={(value) => handleInputChange('walletAddress', value)}
-                        placeholder="Wallet Address"
-                    />
-                    <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-
-
-                        <InputField
-                            label="Salary"
-                            value={formData.salary || ''}
-                            onChange={(value) => handleInputChange('salary', value)}
-                            placeholder="Salary"
-                            type="number"
-                        />
-
-                        <InputField
-                            label="Payday"
-                            value={formData.payday || ''}
-                            onChange={(value) => handleInputChange('payday', value)}
-                            placeholder="Payday"
-                            type="date"
-                        />
-
-
-                    </div>
-
-
+                <div className="py-20 text-center">
+                    <Briefcase className="w-16 h-16 mx-auto mb-4 text-zinc-400" />
+                    <h3 className="mb-2 text-xl font-semibold text-zinc-900 font-lexend">
+                        Professional Information
+                    </h3>
+                    <p className="text-zinc-400 font-lexend">
+                        This tab will be implemented next
+                    </p>
                 </div>
             )}
 
-            {/* {activeTab === 2 && (
+            {activeTab === 2 && (
                 <div className="py-20 text-center">
                     <FileText className="w-16 h-16 mx-auto mb-4 text-zinc-400" />
                     <h3 className="mb-2 text-xl font-semibold text-zinc-900 font-lexend">
@@ -308,7 +352,7 @@ const TabsAddNewEmp = ({ onBack }) => {
                         This tab will be implemented next
                     </p>
                 </div>
-            )} */}
+            )}
 
             {/* Action Buttons */}
             <div className="flex items-center justify-end gap-5 pt-6 mt-8 border-t border-zinc-400/20">
