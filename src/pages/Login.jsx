@@ -4,7 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
+
 import InputFieldAuth from '../components/Form/InputFieldAuth';
+import InputFieldPW from '../components/Form/InputFieldPW';
 
 const loginSchema = Yup.object().shape({
     email: Yup.string().required('Email is required').email('Invalid email format'),
@@ -26,12 +28,12 @@ const Login = () => {
         },
     });
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        const isValid = loginForm.trigger();
+        const isValid = await loginForm.trigger();
         if (!isValid) return;
 
-        // navigate('/dashboard');
+        navigate('/dashboard');
     };
 
     return (
@@ -80,38 +82,24 @@ const Login = () => {
                                 className="w-full text-base font-light bg-transparent outline-none text-zinc-900 placeholder-zinc-400"
                             />
                         </div> */}
+
                         <InputFieldAuth
                             label="Email Address"
                             placeholder="robertallen@example.com"
                             type="email"
+                            defaultValues="robertallen@example.com"
                             {...loginForm.register('email')}
                             error={loginForm.formState.errors.email?.message}
-                        ></InputFieldAuth>
+                        />
 
                         {/* Password */}
-                        <div className="flex items-center w-full px-4 py-2 border border-indigo-500 rounded-lg">
-                            <div className="flex-grow">
-                                <label className="block mb-1 text-xs font-light text-indigo-500 font-lexend">
-                                    Password
-                                </label>
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    defaultValue="12345678"
-                                    className="w-full text-base font-light bg-transparent outline-none text-zinc-900"
-                                />
-                            </div>
-                            <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="ml-3 focus:outline-none"
-                            >
-                                {!showPassword ? (
-                                    <EyeOff className="w-5 h-5 text-zinc-900" />
-                                ) : (
-                                    <Eye className="w-5 h-5 text-zinc-900" />
-                                )}
-                            </button>
-                        </div>
+                        <InputFieldPW
+                            label="Password"
+                            placeholder="Enter your password"
+                            defaultValues="123456789"
+                            {...loginForm.register('password')}
+                            error={loginForm.formState.errors.password?.message}
+                        />
 
                         {/* Options */}
                         <div className="flex items-center justify-between">
