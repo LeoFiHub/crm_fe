@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3000', // Đổi thành URL backend của bạn
+        target: 'http://localhost:3000/api', // Đổi thành URL backend của bạn
         changeOrigin: true,
         secure: false,
       },

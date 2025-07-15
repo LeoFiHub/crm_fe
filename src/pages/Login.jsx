@@ -1,15 +1,37 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
+import InputFieldAuth from '../components/Form/InputFieldAuth';
+
+const loginSchema = Yup.object().shape({
+    email: Yup.string().required('Email is required').email('Invalid email format'),
+    password: Yup.string().required('Password is required').min(8, 'Password must be at least 8 characters'),
+});
 
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(true);
     const navigate = useNavigate();
+    // Form handling
+    const loginForm = useForm({
+        resolver: yupResolver(loginSchema),
+        mode: 'all',
+        reValidateMode: 'onChange',
+        defaultValues: {
+            email: '',
+            password: '',
+        },
+    });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        navigate('/dashboard');
+        const isValid = loginForm.trigger();
+        if (!isValid) return;
+
+        // navigate('/dashboard');
     };
 
     return (
@@ -47,7 +69,7 @@ const Login = () => {
                     {/* Form */}
                     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                         {/* Email */}
-                        <div className="w-full px-4 py-2 border border-indigo-500 rounded-lg">
+                        {/* <div className="w-full px-4 py-2 border border-indigo-500 rounded-lg">
                             <label className="block mb-1 text-xs font-light text-indigo-500 font-lexend">
                                 Email Address
                             </label>
@@ -57,7 +79,14 @@ const Login = () => {
                                 defaultValue="robertallen@example.com"
                                 className="w-full text-base font-light bg-transparent outline-none text-zinc-900 placeholder-zinc-400"
                             />
-                        </div>
+                        </div> */}
+                        <InputFieldAuth
+                            label="Email Address"
+                            placeholder="robertallen@example.com"
+                            type="email"
+                            {...loginForm.register('email')}
+                            error={loginForm.formState.errors.email?.message}
+                        ></InputFieldAuth>
 
                         {/* Password */}
                         <div className="flex items-center w-full px-4 py-2 border border-indigo-500 rounded-lg">

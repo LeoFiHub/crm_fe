@@ -1,6 +1,12 @@
 import { useState } from 'react';
-import InputField from './InputField';
-import SelectField from './SelectField';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
+// import InputField from './InputField';
+// import SelectField from './SelectField';
+
+import InputField from '../Form/InputField';
+import SelectField from '../Form/SelectField';
 import {
     User,
     Briefcase,
@@ -13,24 +19,79 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+// Validation schemas cho từng tab
+const personalInfoSchema = Yup.object().shape({
+    firstName: Yup.string()
+        .required('Tên không được để trống')
+        .min(2, 'Tên phải có ít nhất 2 ký tự'),
+    lastName: Yup.string()
+        .required('Họ không được để trống')
+        .min(2, 'Họ phải có ít nhất 2 ký tự'),
+    mobile: Yup.string()
+        .required('Số điện thoại không được để trống')
+        .matches(/^[0-9]{10,11}$/, 'Số điện thoại phải có 10-11 chữ số'),
+    email: Yup.string()
+        .required('Email không được để trống')
+        .email('Email không hợp lệ'),
+    dateOfBirth: Yup.string()
+        .required('Ngày sinh không được để trống'),
+    maritalStatus: Yup.string()
+        .required('Tình trạng hôn nhân không được để trống'),
+    gender: Yup.string()
+        .required('Giới tính không được để trống'),
+    nationality: Yup.string()
+        .required('Quốc tịch không được để trống'),
+    address: Yup.string()
+        .required('Địa chỉ không được để trống'),
+});
+
+const professionalInfoSchema = Yup.object().shape({
+    walletAddress: Yup.string()
+        .required('Địa chỉ ví không được để trống'),
+    salary: Yup.number()
+        .required('Lương không được để trống')
+        .positive('Lương phải là số dương')
+        .min(0, 'Lương không được âm'),
+    payday: Yup.string()
+        .required('Ngày trả lương không được để trống'),
+});
+
 const TabsAddNewEmp = ({ onBack }) => {
     const [activeTab, setActiveTab] = useState(0);
-    const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
-        mobile: '',
-        email: '',
-        dateOfBirth: '',
-        maritalStatus: '',
-        gender: '',
-        nationality: '',
-        address: '',
-        walletAddress: '',
-        salary: '',
-        payday: ''
+    const navigate = useNavigate();
+
+    // Form validation cho Personal Info
+    const personalForm = useForm({
+        resolver: yupResolver(personalInfoSchema),
+        mode: 'all', // Validate khi onChange, onBlur, và onSubmit
+        reValidateMode: 'onChange', // Re-validate ngay khi người dùng gõ
+        defaultValues: {
+            firstName: '',
+            lastName: '',
+            mobile: '',
+            email: '',
+            dateOfBirth: '',
+            maritalStatus: '',
+            gender: '',
+            nationality: '',
+            address: '',
+        }
     });
 
-    const navigate = useNavigate();
+    // Form validation cho Professional Info
+    const professionalForm = useForm({
+        resolver: yupResolver(professionalInfoSchema),
+        mode: 'all', // Validate khi onChange, onBlur, và onSubmit
+        reValidateMode: 'onChange', // Re-validate ngay khi người dùng gõ
+        defaultValues: {
+            walletAddress: '',
+            salary: '',
+            payday: ''
+        }
+    });
+
+    // Chọn form phù hợp với tab hiện tại
+    const currentForm = activeTab === 0 ? personalForm : professionalForm;
 
     const tabs = [
         {
@@ -63,16 +124,28 @@ const TabsAddNewEmp = ({ onBack }) => {
         // }
     ];
 
-    const handleInputChange = (field, value) => {
-        setFormData(prev => ({
-            ...prev,
-            [field]: value
-        }));
-    };
+    const handleNext = async () => {
+        if (activeTab === 0) {
+            // Validate Personal Info trước khi chuyển tab
+            const isValid = await personalForm.trigger();
+            if (isValid && activeTab < tabs.length - 1) {
+                setActiveTab(activeTab + 1);
+            }
+        } else if (activeTab === 1) {
+            // Validate Professional Info trước khi submit
+            const isValid = await professionalForm.trigger();
+            if (isValid) {
+                // Submit toàn bộ form khi ở tab cuối
+                const personalData = personalForm.getValues();
+                const professionalData = professionalForm.getValues();
 
-    const handleNext = () => {
-        if (activeTab < tabs.length - 1) {
-            setActiveTab(activeTab + 1);
+                const allData = { ...personalData, ...professionalData };
+                console.log('Form data to submit:', allData);
+
+                // TODO: Gọi API để lưu dữ liệu
+                // Có thể navigate về danh sách nhân viên
+                handleCancel();
+            }
         }
     };
 
@@ -167,15 +240,15 @@ const TabsAddNewEmp = ({ onBack }) => {
                         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
                             <InputField
                                 label="First Name"
-                                value={formData.firstName}
-                                onChange={(value) => handleInputChange('firstName', value)}
                                 placeholder="First Name"
+                                {...personalForm.register('firstName')}
+                                error={personalForm.formState.errors.firstName?.message}
                             />
                             <InputField
                                 label="Last Name"
-                                value={formData.lastName}
-                                onChange={(value) => handleInputChange('lastName', value)}
                                 placeholder="Last Name"
+                                {...personalForm.register('lastName')}
+                                error={personalForm.formState.errors.lastName?.message}
                             />
                         </div>
 
@@ -183,39 +256,47 @@ const TabsAddNewEmp = ({ onBack }) => {
                         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
                             <InputField
                                 label="Mobile Number"
-                                value={formData.mobile}
-                                onChange={(value) => handleInputChange('mobile', value)}
                                 placeholder="Mobile Number"
                                 type="tel"
+                                {...personalForm.register('mobile')}
+                                error={personalForm.formState.errors.mobile?.message}
                             />
                             <InputField
                                 label="Email Address"
-                                value={formData.email}
-                                onChange={(value) => handleInputChange('email', value)}
                                 placeholder="Email Address"
                                 type="email"
+                                {...personalForm.register('email')}
+                                error={personalForm.formState.errors.email?.message}
                             />
                         </div>
 
                         {/* Date of Birth & Marital Status */}
                         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-                            <div className="relative flex-1">
+                            <div className="relative flex-1 h-14">
                                 <input
                                     type="date"
-                                    value={formData.dateOfBirth}
-                                    onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
-                                    className="w-full h-14 px-4 pr-10 rounded-[10px] border border-zinc-400/20 text-base font-light font-lexend text-zinc-900 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                                    {...personalForm.register('dateOfBirth')}
+                                    className={`w-full h-full px-4 pr-10 rounded-[10px] border text-base font-light font-lexend text-zinc-900 focus:outline-none focus:ring-1
+                                        ${personalForm.formState.errors.dateOfBirth
+                                            ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                                            : 'border-zinc-400/20 focus:border-indigo-500 focus:ring-indigo-500'
+                                        }`}
                                 />
                                 <div className="absolute transform -translate-y-1/2 pointer-events-none right-4 top-1/2">
                                     <Calendar className="w-5 h-5 text-zinc-900" />
                                 </div>
+                                {personalForm.formState.errors.dateOfBirth && (
+                                    <span className="absolute left-0 text-xs text-red-500 -bottom-5 font-lexend">
+                                        {personalForm.formState.errors.dateOfBirth.message}
+                                    </span>
+                                )}
                             </div>
                             <SelectField
                                 label="Marital Status"
-                                value={formData.maritalStatus}
-                                onChange={(value) => handleInputChange('maritalStatus', value)}
-                                options={maritalStatusOptions}
                                 placeholder="Marital Status"
+                                options={maritalStatusOptions}
+                                {...personalForm.register('maritalStatus')}
+                                error={personalForm.formState.errors.maritalStatus?.message}
                             />
                         </div>
 
@@ -223,17 +304,17 @@ const TabsAddNewEmp = ({ onBack }) => {
                         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
                             <SelectField
                                 label="Gender"
-                                value={formData.gender}
-                                onChange={(value) => handleInputChange('gender', value)}
-                                options={genderOptions}
                                 placeholder="Gender"
+                                options={genderOptions}
+                                {...personalForm.register('gender')}
+                                error={personalForm.formState.errors.gender?.message}
                             />
                             <SelectField
                                 label="Nationality"
-                                value={formData.nationality}
-                                onChange={(value) => handleInputChange('nationality', value)}
-                                options={nationalityOptions}
                                 placeholder="Nationality"
+                                options={nationalityOptions}
+                                {...personalForm.register('nationality')}
+                                error={personalForm.formState.errors.nationality?.message}
                             />
                         </div>
 
@@ -241,9 +322,9 @@ const TabsAddNewEmp = ({ onBack }) => {
                         <div className="w-full">
                             <InputField
                                 label="Address"
-                                value={formData.address}
-                                onChange={(value) => handleInputChange('address', value)}
                                 placeholder="Address"
+                                {...personalForm.register('address')}
+                                error={personalForm.formState.errors.address?.message}
                             />
                         </div>
 
@@ -256,33 +337,27 @@ const TabsAddNewEmp = ({ onBack }) => {
                 <div className="space-y-5">
                     <InputField
                         label="Wallet Address"
-                        value={formData.walletAddress || ''}
-                        onChange={(value) => handleInputChange('walletAddress', value)}
                         placeholder="Wallet Address"
+                        {...professionalForm.register('walletAddress')}
+                        error={professionalForm.formState.errors.walletAddress?.message}
                     />
                     <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-
-
                         <InputField
                             label="Salary"
-                            value={formData.salary || ''}
-                            onChange={(value) => handleInputChange('salary', value)}
                             placeholder="Salary"
                             type="number"
+                            {...professionalForm.register('salary')}
+                            error={professionalForm.formState.errors.salary?.message}
                         />
 
                         <InputField
                             label="Payday"
-                            value={formData.payday || ''}
-                            onChange={(value) => handleInputChange('payday', value)}
                             placeholder="Payday"
                             type="date"
+                            {...professionalForm.register('payday')}
+                            error={professionalForm.formState.errors.payday?.message}
                         />
-
-
                     </div>
-
-
                 </div>
             )}
 
@@ -322,11 +397,14 @@ const TabsAddNewEmp = ({ onBack }) => {
                 </button>
                 <button
                     onClick={handleNext}
-                    disabled={activeTab === tabs.length - 1}
+                    disabled={currentForm.formState.isSubmitting}
                     className="h-12 px-6 bg-indigo-500 rounded-[10px] flex justify-center items-center gap-2.5 hover:bg-indigo-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <span className="text-base font-light text-white font-lexend">
-                        {activeTab === tabs.length - 1 ? 'Submit' : 'Next'}
+                        {currentForm.formState.isSubmitting
+                            ? 'Đang xử lý...'
+                            : (activeTab === tabs.length - 1 ? 'Submit' : 'Next')
+                        }
                     </span>
                 </button>
             </div>

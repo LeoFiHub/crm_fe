@@ -1,11 +1,15 @@
-import { useState, useMemo, use, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useReactTable, getCoreRowModel, getPaginationRowModel, getFilteredRowModel, flexRender } from '@tanstack/react-table';
-import { Eye, Edit, Trash2, ChevronDown } from 'lucide-react';
+import { Eye, Edit, Trash2, ChevronDown, Plus } from 'lucide-react';
+// import { useNavigate } from 'react-router-dom';
 import { getUsers } from '../../api/user';
 
 const EmployeeTable = () => {
     const [globalFilter, setGlobalFilter] = useState('');
     const [user, setUser] = useState();
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [selectedEmployee, setSelectedEmployee] = useState(null);
+    // const navigate = useNavigate();
 
 
     useEffect(() => {
@@ -19,33 +23,34 @@ const EmployeeTable = () => {
     }, []);
 
     // Memoize the data to prevent unnecessary re-computation
-    const data = useMemo(
-        () => [
-            {
-                id: 1,
-                name: 'Bessie Cooper',
-                phone: '091233412',
-                department: 'HR',
-                designation: 'HR Manager',
-                type: 'Office',
-                status: 'Permanent',
-                avatar:
-                    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3',
-            },
-            {
-                id: 2,
-                name: 'Devon Lane',
-                phone: '091233412',
-                department: 'BA',
-                designation: 'Business Analyst',
-                type: 'Remote',
-                status: 'Permanent',
-                avatar:
-                    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3',
-            },
-        ],
-        []
-    );
+    // const data = useMemo(
+    //     () => [
+    //         {
+    //             id: 1,
+    //             name: 'Bessie Cooper',
+    //             phone: '091233412',
+    //             department: 'HR',
+    //             designation: 'HR Manager',
+    //             type: 'Office',
+    //             status: 'Permanent',
+    //             avatar:
+    //                 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3',
+    //         },
+    //         {
+    //             id: 2,
+    //             name: 'Devon Lane',
+    //             phone: '091233412',
+    //             department: 'BA',
+    //             designation: 'Business Analyst',
+    //             type: 'Remote',
+    //             status: 'Permanent',
+    //             avatar:
+    //                 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3',
+    //         },
+    //     ],
+    //     []
+    // );
+    const data = useMemo(() => user || [], [user]);
 
     // Memoize the columns to prevent re-computation on every render
     const columns = useMemo(
@@ -123,12 +128,15 @@ const EmployeeTable = () => {
                 header: 'Action',
                 enableSorting: false,
                 enableColumnFilter: false,
-                cell: () => (
+                cell: ({ row }) => (
                     <div className="flex gap-1 sm:gap-2.5">
                         <button className="flex items-center justify-center w-6 h-6 rounded sm:w-8 sm:h-8 hover:bg-gray-100">
                             <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-900" />
                         </button>
-                        <button className="flex items-center justify-center w-6 h-6 rounded sm:w-8 sm:h-8 hover:bg-gray-100">
+                        <button
+                            onClick={() => openEditModal(row.original)}
+                            className="flex items-center justify-center w-6 h-6 rounded sm:w-8 sm:h-8 hover:bg-gray-100"
+                        >
                             <Edit className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-900" />
                         </button>
                         <button className="flex items-center justify-center w-6 h-6 rounded sm:w-8 sm:h-8 hover:bg-gray-100">
@@ -158,7 +166,39 @@ const EmployeeTable = () => {
         },
     });
 
-    // =========================== Handlers =========================
+    // =========================== Handlers ===========================
+
+    // const handleAddEmployee = () => {
+    //     // Chuyển hướng đến trang thêm nhân viên
+    //     navigate('/employees/add');
+    // };
+
+    // const handleEditEmployee = async (data) => {
+    //     try {
+    //         // TODO: Gọi API cập nhật nhân viên
+    //         console.log('Updating employee:', data);
+    //         // Tạm thời cập nhật state local để demo
+    //         setUser(prev => prev?.map(emp =>
+    //             emp.id === selectedEmployee.id
+    //                 ? { ...emp, ...data }
+    //                 : emp
+    //         ));
+    //         setShowEditModal(false);
+    //         setSelectedEmployee(null);
+    //     } catch (error) {
+    //         console.error('Error updating employee:', error);
+    //     }
+    // };
+
+    const openEditModal = (employee) => {
+        setSelectedEmployee(employee);
+        setShowEditModal(true);
+    };
+
+    const closeModals = () => {
+        setShowEditModal(false);
+        setSelectedEmployee(null);
+    };
 
     return (
         <div className="w-full p-3 overflow-hidden bg-white sm:p-4">
@@ -173,10 +213,18 @@ const EmployeeTable = () => {
                         className="w-full max-w-xs h-10 px-3 rounded-[10px] border border-zinc-400/20 text-zinc-900 text-sm font-light font-lexend"
                     />
                 </div>
-                <div className="flex items-center justify-center mb-4 fy-ce">
+                <div className="flex items-center justify-center mb-4">
+                    {/* Add Employee Button */}
+                    {/* <button
+                        onClick={handleAddEmployee}
+                        className="flex items-center gap-2 px-4 py-2 text-white bg-indigo-500 rounded-lg hover:bg-indigo-600 font-lexend"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Thêm nhân viên
+                    </button> */}
 
                     {/* Search filter */}
-                    <div data-size="Large" data-state="Icon+Button Auto Width" data-type="Fill" className="w-28 h-12 p-5 rounded-[10px] outline outline-1 outline-offset-[-1px] outline-zinc-400/20 inline-flex justify-center items-center gap-2.5">
+                    <div data-size="Large" data-state="Icon+Button Auto Width" data-type="Fill" className="w-28 h-12 p-5 rounded-[10px] outline outline-1 outline-offset-[-1px] outline-zinc-400/20 inline-flex justify-center items-center gap-2.5 ml-4">
                         <div className="relative w-6 h-6 overflow-hidden">
                             <div className="w-1.5 h-0 left-[3px] top-[6px] absolute rounded-md outline outline-[1.50px] outline-offset-[-0.75px] outline-zinc-900" />
                             <div className="w-2 h-0 left-[3px] top-[12px] absolute rounded-md outline outline-[1.50px] outline-offset-[-0.75px] outline-zinc-900" />
@@ -307,6 +355,39 @@ const EmployeeTable = () => {
                     </button>
                 </div>
             </div>
+
+            {/* Add Employee Button - Floating action button */}
+            {/* <button
+                onClick={() => setShowAddModal(true)}
+                className="fixed p-3 text-white transition-all bg-indigo-600 rounded-full shadow-md bottom-5 right-5 hover:bg-indigo-700"
+            >
+                <Plus className="w-5 h-5" />
+            </button> */}
+
+            {/* Edit Employee Modal */}
+            {showEditModal && selectedEmployee && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-lg">
+                        <button
+                            onClick={closeModals}
+                            className="absolute z-10 p-1 text-gray-500 top-4 right-4 hover:text-gray-700"
+                        >
+                            <Edit className="w-6 h-6" />
+                        </button>
+                        {/* TODO: Create a simple edit form or use existing components */}
+                        <div className="p-6">
+                            <h2 className="mb-4 text-xl font-semibold">Edit Employee</h2>
+                            <p>Edit form will be implemented here</p>
+                            <button
+                                onClick={closeModals}
+                                className="px-4 py-2 mt-4 text-white bg-gray-500 rounded"
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
