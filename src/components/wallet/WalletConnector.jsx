@@ -34,6 +34,8 @@ const WalletConnector = ({ onConnect, onDisconnect, className = '' }) => {
 
     const availableWallets = getAvailableWallets();
 
+    console.log('WalletConnector - Available wallets:', availableWallets);
+
     if (isConnected) {
         return (
             <div className={`flex items-center gap-3 ${className}`}>
@@ -85,57 +87,48 @@ const WalletConnector = ({ onConnect, onDisconnect, className = '' }) => {
                         </h3>
 
                         <div className="space-y-3">
-                            {availableWallets.length > 0 ? (
-                                availableWallets.map((wallet) => (
-                                    <button
-                                        key={wallet.type}
-                                        onClick={() => handleConnect(wallet.type)}
-                                        disabled={!wallet.available || isConnecting}
-                                        className="w-full flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:border-indigo-300 hover:bg-indigo-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        <span className="text-2xl">{wallet.icon}</span>
-                                        <div className="text-left">
-                                            <div className="font-medium text-gray-900">
-                                                {wallet.name}
-                                            </div>
-                                            <div className="text-sm text-gray-500">
-                                                {wallet.available ? 'Available' : 'Not installed'}
-                                            </div>
+                            {/* Always show both wallets - installed and not installed */}
+                            {[
+                                {
+                                    name: 'MetaMask',
+                                    type: 'metamask',
+                                    icon: '🦊',
+                                    available: availableWallets.some(w => w.type === 'metamask'),
+                                    downloadUrl: 'https://metamask.io/download/'
+                                },
+                                {
+                                    name: 'Petra Wallet',
+                                    type: 'petra',
+                                    icon: '🔴',
+                                    available: availableWallets.some(w => w.type === 'petra'),
+                                    downloadUrl: 'https://petra.app/'
+                                }
+                            ].map((wallet) => (
+                                <button
+                                    key={wallet.type}
+                                    onClick={() => wallet.available ? handleConnect(wallet.type) : window.open(wallet.downloadUrl, '_blank')}
+                                    disabled={isConnecting}
+                                    className="w-full flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:border-indigo-300 hover:bg-indigo-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    <span className="text-2xl">{wallet.icon}</span>
+                                    <div className="text-left flex-1">
+                                        <div className="font-medium text-gray-900">
+                                            {wallet.name}
                                         </div>
-                                        {isConnecting && (
-                                            <Loader2 className="w-4 h-4 animate-spin ml-auto" />
-                                        )}
-                                    </button>
-                                ))
-                            ) : (
-                                <div className="text-center py-8">
-                                    <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                                    <h4 className="text-lg font-medium text-gray-900 mb-2">
-                                        No Wallets Found
-                                    </h4>
-                                    <p className="text-gray-500 mb-4">
-                                        Please install MetaMask or Petra Wallet to continue.
-                                    </p>
-                                    <div className="flex flex-col gap-2">
-                                        <a
-                                            href="https://metamask.io/download/"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-                                        >
-                                            🦊 Install MetaMask
-                                        </a>
-                                        <a
-                                            href="https://petra.app/"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-                                        >
-                                            🔴 Install Petra Wallet
-                                        </a>
+                                        <div className="text-sm text-gray-500">
+                                            {wallet.available ? 'Click to connect' : 'Click to install'}
+                                        </div>
                                     </div>
-                                </div>
-                            )}
+                                    {wallet.available ? (
+                                        <div className="text-green-500 text-sm font-medium">Ready</div>
+                                    ) : (
+                                        <div className="text-blue-500 text-sm font-medium">Install</div>
+                                    )}
+                                    {isConnecting && (
+                                        <Loader2 className="w-4 h-4 animate-spin ml-auto" />
+                                    )}
+                                </button>
+                            ))}
                         </div>
 
                         <div className="flex justify-end gap-3 mt-6">

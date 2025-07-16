@@ -10,6 +10,13 @@ export class WalletManager {
     detectWallets() {
         const wallets = [];
 
+        console.log('Detecting wallets...');
+        console.log('window.ethereum:', typeof window !== 'undefined' ? !!window.ethereum : false);
+        console.log('window.ethereum.isMetaMask:', typeof window !== 'undefined' ? !!window.ethereum?.isMetaMask : false);
+        console.log('window.aptos:', typeof window !== 'undefined' ? !!window.aptos : false);
+        console.log('window.petra:', typeof window !== 'undefined' ? !!window.petra : false);
+        console.log('window.martian:', typeof window !== 'undefined' ? !!window.martian : false);
+
         // Check for MetaMask
         if (typeof window !== 'undefined' && window.ethereum?.isMetaMask) {
             wallets.push({
@@ -20,8 +27,14 @@ export class WalletManager {
             });
         }
 
-        // Check for Petra Wallet (Aptos)
-        if (typeof window !== 'undefined' && window.aptos) {
+        // Check for Petra Wallet (Aptos) - Multiple detection methods
+        const hasPetra = (
+            (typeof window !== 'undefined' && window.aptos) ||
+            (typeof window !== 'undefined' && window.petra) ||
+            (typeof window !== 'undefined' && window.martian)
+        );
+
+        if (hasPetra) {
             wallets.push({
                 name: 'Petra Wallet',
                 type: 'petra',
@@ -30,6 +43,7 @@ export class WalletManager {
             });
         }
 
+        console.log('Detected wallets:', wallets);
         // Only return supported wallet types
         return wallets;
     }
