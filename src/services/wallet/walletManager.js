@@ -20,22 +20,43 @@ export class WalletManager {
             });
         }
 
-        // Check for other wallets (can be extended)
-        if (typeof window !== 'undefined' && window.ethereum && !window.ethereum.isMetaMask) {
+        // Check for Petra Wallet (Aptos)
+        if (typeof window !== 'undefined' && window.aptos) {
             wallets.push({
-                name: 'Other Wallet',
-                type: 'other',
-                icon: '💰',
+                name: 'Petra Wallet',
+                type: 'petra',
+                icon: '🔴',
                 available: true
             });
         }
 
+        // Only return supported wallet types
         return wallets;
     }
 
     // Connect to wallet
-    async connectWallet(walletType = 'metamask') {
-        if (this.isConnecting) return null;
+    async connectWallet(walletType = 'metamask') {        
+        if (this.isConnecting) {
+            console.log('Already connecting to a wallet, please wait...');
+            return null;
+        }
+
+        // Check if already connected to this wallet type
+        const existingConnection = this.getWalletInfo();
+        if (existingConnection && existingConnection.type === walletType) {
+            console.log('Already connected to', walletType);
+            return {
+                address: existingConnection.address,
+                type: existingConnection.type,
+                chainId: existingConnection.chainId || existingConnection.network
+            };
+        }
+
+        // Validate wallet type
+        const supportedTypes = ['metamask', 'petra'];
+        if (typeof walletType !== 'string' || !supportedTypes.includes(walletType)) {
+            throw new Error(`Unsupported wallet type: ${walletType}. Supported types: ${supportedTypes.join(', ')}`);
+        }
 
         this.isConnecting = true;
 
@@ -43,6 +64,8 @@ export class WalletManager {
             switch (walletType) {
                 case 'metamask':
                     return await this.connectMetaMask();
+                case 'petra':
+                    return await this.connectPetra();
                 default:
                     throw new Error('Unsupported wallet type');
             }
@@ -61,10 +84,17 @@ export class WalletManager {
         }
 
         try {
-            // Request account access
-            const accounts = await window.ethereum.request({
-                method: 'eth_requestAccounts',
+            // First, check if already connected
+            let accounts = await window.ethereum.request({
+                method: 'eth_accounts',
             });
+
+            // If no accounts, request permission
+            if (accounts.length === 0) {
+                accounts = await window.ethereum.request({
+                    method: 'eth_requestAccounts',
+                });
+            }
 
             if (accounts.length === 0) {
                 throw new Error('No accounts found');
@@ -95,7 +125,58 @@ export class WalletManager {
 
         } catch (error) {
             console.error('MetaMask connection error:', error);
+            
+            // Handle specific MetaMask errors
+            if (error.code === -32002) {
+                throw new Error('MetaMask is already processing a connection request. Please check your MetaMask extension.');
+            }
+            
+            if (error.code === 4001) {
+                throw new Error('User rejected the connection request.');
+            }
+            
             throw new Error(`Failed to connect MetaMask: ${error.message}`);
+        }
+    }
+
+    // Connect Petra Wallet (Aptos)
+    async connectPetra() {
+        if (!window.aptos) {
+            throw new Error('Petra Wallet is not installed');
+        }
+
+        try {
+            // Request connection to Petra
+            const response = await window.aptos.connect();
+            
+            if (!response || !response.address) {
+                throw new Error('Failed to get account from Petra Wallet');
+            }
+
+            const address = response.address;
+            this.walletAddress = address;
+            this.connectedWallet = 'petra';
+
+            // Get network info (Aptos)
+            const network = await window.aptos.network();
+
+            // Save to localStorage
+            this.saveWalletInfo({
+                address,
+                type: 'petra',
+                network: network || 'mainnet',
+                connectedAt: new Date().toISOString()
+            });
+
+            return {
+                address,
+                type: 'petra',
+                network: network || 'mainnet'
+            };
+
+        } catch (error) {
+            console.error('Petra Wallet connection error:', error);
+            throw new Error(`Failed to connect Petra Wallet: ${error.message}`);
         }
     }
 
@@ -213,6 +294,16 @@ export class WalletManager {
             // Reload page on chain change
             window.location.reload();
         });
+    }
+
+    // Get supported wallet types
+    getSupportedWalletTypes() {
+        return ['metamask', 'petra'];
+    }
+
+    // Check if wallet type is supported
+    isSupportedWalletType(type) {
+        return this.getSupportedWalletTypes().includes(type);
     }
 }
 

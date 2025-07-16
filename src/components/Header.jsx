@@ -1,5 +1,5 @@
-import React from 'react';
-import { Search, Bell, ChevronDown, Menu } from 'lucide-react';
+import { Search, Bell, ChevronDown, Menu, Wallet, LogOut } from 'lucide-react';
+import { useWallet } from '../hooks/useWallet';
 
 const Header = ({
     userName = "Robert Allen",
@@ -7,6 +7,30 @@ const Header = ({
     greeting = "Good Morning",
     onMenuClick
 }) => {
+    const { 
+        isConnected, 
+        walletAddress, 
+        walletType, 
+        connectWallet, 
+        disconnectWallet, 
+        isConnecting 
+    } = useWallet();
+
+    const formatAddress = (address) => {
+        if (!address) return '';
+        return `${address.slice(0, 6)}...${address.slice(-4)}`;
+    };
+
+    const getWalletIcon = (type) => {
+        switch (type) {
+            case 'metamask':
+                return '🦊';
+            case 'petra':
+                return '🔴';
+            default:
+                return '💰';
+        }
+    };
     return (
         <div className="w-full px-4 py-4 bg-white border-b border-zinc-400/20 sm:px-6">
             <div className="flex items-center justify-between">
@@ -52,6 +76,39 @@ const Header = ({
                     <button className="w-10 h-10 sm:w-12 sm:h-12 p-2 sm:p-3 bg-zinc-400/10 rounded-[10px] flex justify-center items-center hover:bg-zinc-400/20 transition-colors">
                         <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-900" />
                     </button>
+
+                    {/* Wallet Connection */}
+                    {isConnected ? (
+                        <div className="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded-lg">
+                            <span className="text-lg">{getWalletIcon(walletType)}</span>
+                            <div className="hidden sm:flex flex-col">
+                                <span className="text-sm font-semibold text-green-700 font-lexend">
+                                    {formatAddress(walletAddress)}
+                                </span>
+                                <span className="text-xs text-green-600 font-lexend capitalize">
+                                    {walletType} Connected
+                                </span>
+                            </div>
+                            <button
+                                onClick={disconnectWallet}
+                                className="p-1 hover:bg-red-100 rounded transition-colors ml-1"
+                                title="Disconnect Wallet"
+                            >
+                                <LogOut className="w-4 h-4 text-red-600" />
+                            </button>
+                        </div>
+                    ) : (
+                        <button
+                            onClick={() => connectWallet()}
+                            disabled={isConnecting}
+                            className="flex items-center gap-2 px-3 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <Wallet className="w-4 h-4" />
+                            <span className="hidden sm:inline text-sm font-medium font-lexend">
+                                {isConnecting ? 'Connecting...' : 'Connect Wallet'}
+                            </span>
+                        </button>
+                    )}
 
                     {/* User Profile */}
                     <div className="flex items-center gap-2 p-2 transition-colors border rounded-lg sm:gap-3 border-zinc-400/20 hover:bg-gray-50">

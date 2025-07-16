@@ -9,7 +9,7 @@ const WalletConnector = ({ onConnect, onDisconnect, className = '' }) => {
         walletType,
         isConnecting,
         error,
-        connectWallet,
+        connectSpecificWallet,
         disconnectWallet,
         getAvailableWallets,
         formatAddress
@@ -18,7 +18,7 @@ const WalletConnector = ({ onConnect, onDisconnect, className = '' }) => {
     const [showWalletModal, setShowWalletModal] = useState(false);
 
     const handleConnect = async (type = 'metamask') => {
-        const result = await connectWallet(type);
+        const result = await connectSpecificWallet(type);
         if (result && onConnect) {
             onConnect(result);
         }
@@ -40,7 +40,7 @@ const WalletConnector = ({ onConnect, onDisconnect, className = '' }) => {
                 <div className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg">
                     <CheckCircle className="w-4 h-4 text-green-500" />
                     <span className="text-sm font-medium text-green-700">
-                        {walletType === 'metamask' ? '🦊' : '💰'} {formatAddress(walletAddress)}
+                        {walletType === 'metamask' ? '🦊' : walletType === 'petra' ? '🔴' : '💰'} {formatAddress(walletAddress)}
                     </span>
                 </div>
                 <button
@@ -114,16 +114,26 @@ const WalletConnector = ({ onConnect, onDisconnect, className = '' }) => {
                                         No Wallets Found
                                     </h4>
                                     <p className="text-gray-500 mb-4">
-                                        Please install MetaMask or another compatible wallet.
+                                        Please install MetaMask or Petra Wallet to continue.
                                     </p>
-                                    <a
-                                        href="https://metamask.io/download/"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-                                    >
-                                        🦊 Install MetaMask
-                                    </a>
+                                    <div className="flex flex-col gap-2">
+                                        <a
+                                            href="https://metamask.io/download/"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+                                        >
+                                            🦊 Install MetaMask
+                                        </a>
+                                        <a
+                                            href="https://petra.app/"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                                        >
+                                            🔴 Install Petra Wallet
+                                        </a>
+                                    </div>
                                 </div>
                             )}
                         </div>

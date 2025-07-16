@@ -120,11 +120,12 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
             {/* Sidebar */}
             <div className={`
-                fixed top-0 left-0 z-50 lg:z-10 lg:relative
-                w-72 h-full bg-white shadow-lg lg:shadow-none
+                fixed top-0 left-0 z-50 lg:z-10 lg:sticky lg:top-0
+                w-72 h-screen bg-white shadow-lg lg:shadow-none
                 transform transition-transform duration-300 ease-in-out lg:transform-none
                 ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
                 lg:translate-x-0 lg:flex-shrink-0
+                overflow-hidden
             `}>
                 {/* Background */}
                 <div className="w-full h-full absolute bg-zinc-400/5 rounded-none lg:rounded-[20px]" />
@@ -150,7 +151,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                 </div>
 
                 {/* Menu Items */}
-                <div className="relative z-10 flex-1 px-6 lg:px-[30px] pt-8 lg:pt-[50px] pb-24 lg:pb-[100px] overflow-y-auto">
+                <div className="relative z-10 flex-1 px-6 lg:px-[30px] pt-8 lg:pt-[50px] pb-24 lg:pb-[100px] overflow-y-auto max-h-[calc(100vh-200px)]">
                     <div className="space-y-2.5">
                         {menuItems.map((item, index) => (
                             <MenuItem key={index} {...item} />

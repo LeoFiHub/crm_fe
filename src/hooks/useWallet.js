@@ -43,13 +43,43 @@ export const useWallet = () => {
         }
     }, []);
 
-    // Connect wallet
-    const connectWallet = useCallback(async (walletType = 'metamask') => {
+    // Connect wallet with auto-detection
+    const connectWallet = useCallback(async (preferredType = null) => {
+        // Prevent multiple calls while connecting
+        if (isConnecting) {
+            console.log('Already connecting, ignoring this call');
+            return null;
+        }
+        
         setIsConnecting(true);
         setError(null);
 
         try {
-            const result = await walletManager.connectWallet(walletType);
+            // Validate preferredType parameter
+            if (preferredType && typeof preferredType !== 'string') {
+                console.error('Invalid preferredType parameter:', preferredType);
+                preferredType = null; // Reset to trigger auto-detection
+            }
+
+            // Auto-detect available wallets if no type specified
+            if (!preferredType) {
+                const availableWallets = walletManager.detectWallets();
+                
+                // Prefer MetaMask if available, otherwise use first supported wallet
+                const metamaskWallet = availableWallets.find(w => w.type === 'metamask');
+                const petraWallet = availableWallets.find(w => w.type === 'petra');
+                
+                if (metamaskWallet && metamaskWallet.available) {
+                    preferredType = 'metamask';
+                } else if (petraWallet && petraWallet.available) {
+                    preferredType = 'petra';
+                } else {
+                    // No supported wallets found
+                    throw new Error('No compatible wallet found. Please install MetaMask or Petra Wallet.');
+                }
+            }
+
+            const result = await walletManager.connectWallet(preferredType);
 
             if (result) {
                 setIsConnected(true);
@@ -59,17 +89,20 @@ export const useWallet = () => {
                 // Load balance
                 await loadBalance();
 
+                // Success notification
+                console.log(`✅ Successfully connected to ${result.type} wallet: ${result.address}`);
+
                 return result;
             }
         } catch (error) {
             setError(error.message);
-            console.error('Connection failed:', error);
+            console.error('❌ Connection failed:', error.message);
         } finally {
             setIsConnecting(false);
         }
 
         return null;
-    }, [loadBalance]);
+    }, [loadBalance, isConnecting]);
 
     // Disconnect wallet
     const disconnectWallet = useCallback(async () => {
@@ -120,6 +153,15 @@ export const useWallet = () => {
         return walletManager.detectWallets();
     }, []);
 
+    // Connect specific wallet type
+    const connectSpecificWallet = useCallback(async (walletType) => {
+        // Validate wallet type before attempting connection
+        if (!walletManager.isSupportedWalletType(walletType)) {
+            throw new Error(`Wallet type "${walletType}" is not supported. Supported types: ${walletManager.getSupportedWalletTypes().join(', ')}`);
+        }
+        return await connectWallet(walletType);
+    }, [connectWallet]);
+
     // Refresh balance
     const refreshBalance = useCallback(async () => {
         await loadBalance();
@@ -136,6 +178,7 @@ export const useWallet = () => {
 
         // Methods
         connectWallet,
+        connectSpecificWallet,
         disconnectWallet,
         sendTransaction,
         signMessage,
