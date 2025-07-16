@@ -6,6 +6,7 @@ import axios from 'axios';
 import { ethers } from 'ethers';
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
+import { ExternalLink } from 'lucide-react';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -24,7 +25,7 @@ const DepositCoinsPage = () => {
         { payment_date: '2023-10-02', amount: 20000, stablecoin_type: 'USDT', transaction_hash: '0xabcdef1234567890', status: 'Success' },
     ]
 
-    
+
     const [walletAddress, setWalletAddress] = useState('');
     const [form] = Form.useForm();
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -115,6 +116,7 @@ const DepositCoinsPage = () => {
             // Cập nhật lịch sử giao dịch
             const txResponse = await axios.get('/api/transactions?type=deposit');
             setTransactions(Array.isArray(txResponse.data) ? txResponse.data : []);
+
         } catch (error) {
             console.error('Lỗi nạp tiền:', error);
             toast.error('Nạp tiền thất bại. Vui lòng kiểm tra số dư ví.');
@@ -138,7 +140,11 @@ const DepositCoinsPage = () => {
                     rel="noopener noreferrer"
                     className="text-blue-500 underline"
                 >
-                    {text.slice(0, 6)}...
+                    {/* {text.slice(0, 6)}...{text.slice(-4)} */}
+                    <div className="flex gap-2 tracking-wider">
+                        {text.slice(0, 6)}...{text.slice(-4)}
+                        <ExternalLink className="w-3 h-3" />
+                    </div>
                 </a>
             ),
         },

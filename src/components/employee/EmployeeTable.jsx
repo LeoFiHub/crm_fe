@@ -60,12 +60,12 @@ const EmployeeTable = () => {
                 header: 'Employee Name',
                 cell: ({ row }) => (
                     <div className="flex items-center gap-2.5 min-w-0">
-                        <img
+                        {/* <img
                             className="flex-shrink-0 object-cover w-8 h-8 rounded-full sm:w-9 sm:h-9"
                             src={row.original.avatar}
                             alt={row.original.name}
                             loading="lazy"
-                        />
+                        /> */}
                         <span className="text-sm font-light truncate text-zinc-900 sm:text-base font-lexend">
                             {row.original.name}
                         </span>

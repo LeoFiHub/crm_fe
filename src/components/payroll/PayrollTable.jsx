@@ -1,94 +1,106 @@
 import { useState, useMemo } from 'react';
 import { useReactTable, getCoreRowModel, getPaginationRowModel, getFilteredRowModel, flexRender } from '@tanstack/react-table';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, ExternalLink } from 'lucide-react';
 
 const PayrollTable = () => {
     const [globalFilter, setGlobalFilter] = useState('');
 
-    // Memoized data for payroll
+    // Memoized data for payroll (updated fields)
     const data = useMemo(
         () => [
             {
                 id: 1,
-                name: 'Bessie Cooper',
-                ctc: 6000000, // Annual CTC in VND
-                salaryPerMonth: 500000, // Monthly salary in VND
-                deduction: 50000, // Deduction in VND
-                status: 'Pending',
-                avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3',
+                fullname: 'Nguyen Van A',
+                dob: '1990-01-15',
+                walletAddress: '0x1234abcd5678efgh9012ijkl3456mnop7890qrst',
+                amount: 500000,
+                stablecoin_type: 'USDT',
+                Status: 'Pending',
             },
             {
                 id: 2,
-                name: 'Devon Lane',
-                ctc: 7200000,
-                salaryPerMonth: 600000,
-                deduction: 60000,
-                status: 'Approved',
-                avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3',
+                fullname: 'Tran Thi B',
+                dob: '1988-05-22',
+                walletAddress: '0xabcd1234efgh5678ijkl9012mnop3456qrst7890',
+                amount: 600000,
+                stablecoin_type: 'USDC',
+                Status: 'Approved',
             },
         ],
         []
     );
 
-    // Memoized columns for payroll
+    // Memoized columns for payroll (updated fields)
     const columns = useMemo(
         () => [
             {
-                accessorKey: 'name',
-                header: 'Employee Name',
-                cell: ({ row }) => (
-                    <div className="flex items-center gap-2.5 min-w-0">
-                        <img
-                            className="flex-shrink-0 object-cover w-8 h-8 rounded-full sm:w-9 sm:h-9"
-                            src={row.original.avatar}
-                            alt={row.original.name}
-                            loading="lazy"
-                        />
-                        <span className="text-sm font-light truncate text-zinc-900 sm:text-base font-lexend">
-                            {row.original.name}
-                        </span>
-                    </div>
-                ),
-                filterFn: 'includesString',
-            },
-            {
-                accessorKey: 'ctc',
-                header: 'CTC (VND)',
+                accessorKey: 'fullname',
+                header: 'Full Name',
                 cell: ({ getValue }) => (
-                    <span className="text-sm font-light text-zinc-900 sm:text-base font-lexend">
-                        {getValue().toLocaleString('vi-VN')}
+                    <span className="text-sm font-light truncate text-zinc-900 sm:text-base font-lexend">
+                        {getValue()}
                     </span>
                 ),
                 filterFn: 'includesString',
             },
             {
-                accessorKey: 'salaryPerMonth',
-                header: 'Salary/Month (VND)',
+                accessorKey: 'dob',
+                header: 'Date of Birth',
                 cell: ({ getValue }) => (
                     <span className="text-sm font-light text-zinc-900 sm:text-base font-lexend">
-                        {getValue().toLocaleString('vi-VN')}
+                        {getValue()}
                     </span>
                 ),
                 filterFn: 'includesString',
             },
             {
-                accessorKey: 'deduction',
-                header: 'Deduction (VND)',
+                accessorKey: 'walletAddress',
+                header: 'Wallet Address',
                 cell: ({ getValue }) => (
-                    <span className="text-sm font-light text-zinc-900 sm:text-base font-lexend">
-                        {getValue().toLocaleString('vi-VN')}
+                    <span className="text-xs font-light break-all text-zinc-900 font-lexend">
+                        <a
+                            href={`https://explorer.aptoslabs.com/txn/${getValue()}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 underline"
+                        >
+                            <div className="flex gap-2 tracking-wider">
+                                {getValue().slice(0, 6)}...{getValue().slice(-4)}
+                                <ExternalLink className="w-3 h-3" />
+                            </div>
+                        </a>
+
                     </span>
                 ),
                 filterFn: 'includesString',
             },
             {
-                accessorKey: 'status',
+                accessorKey: 'amount',
+                header: 'Amount',
+                cell: ({ getValue }) => (
+                    <span className="text-sm font-light text-zinc-900 sm:text-base font-lexend">
+                        {typeof getValue() === 'number' ? getValue().toLocaleString('vi-VN') : ''}
+                    </span>
+                ),
+                filterFn: 'includesString',
+            },
+            {
+                accessorKey: 'stablecoin_type',
+                header: 'Stablecoin',
+                cell: ({ getValue }) => (
+                    <span className="text-sm font-light text-zinc-900 sm:text-base font-lexend">
+                        {getValue()}
+                    </span>
+                ),
+                filterFn: 'includesString',
+            },
+            {
+                accessorKey: 'Status',
                 header: 'Status',
                 cell: ({ getValue }) => (
                     <div
-                        className={`px-2 py-[3px] rounded text-xs font-light font-lexend inline-block ${
-                            getValue() === 'Approved' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'
-                        }`}
+                        className={`px-2 py-[3px] rounded text-xs font-light font-lexend inline-block ${getValue() === 'Approved' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'
+                            }`}
                     >
                         {getValue()}
                     </div>
@@ -103,13 +115,12 @@ const PayrollTable = () => {
                 cell: ({ row }) => (
                     <div className="flex gap-2.5">
                         <button
-                            className={`px-3 py-1 rounded text-sm font-light font-lexend ${
-                                row.original.status === 'Approved'
-                                    ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                                    : 'bg-indigo-500 text-white hover:bg-indigo-600'
-                            }`}
-                            disabled={row.original.status === 'Approved'}
-                            onClick={() => console.log(`Approve ${row.original.name}`)} // Replace with actual approve logic
+                            className={`px-3 py-1 rounded text-sm font-light font-lexend ${row.original.Status === 'Approved'
+                                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                                : 'bg-indigo-500 text-white hover:bg-indigo-600'
+                                }`}
+                            disabled={row.original.Status === 'Approved'}
+                            onClick={() => console.log(`Approve ${row.original.fullname}`)} // Replace with actual approve logic
                         >
                             Approve
                         </button>
@@ -161,13 +172,12 @@ const PayrollTable = () => {
                                 {headerGroup.headers.map((header, index) => (
                                     <th
                                         key={header.id}
-                                        className={`px-2 sm:px-4 py-2.5 text-left text-zinc-900 text-sm sm:text-base font-semibold font-lexend ${
-                                            index === 1 ? 'hidden sm:table-cell' : // CTC
+                                        className={`px-2 sm:px-4 py-2.5 text-left text-zinc-900 text-sm sm:text-base font-semibold font-lexend ${index === 1 ? 'hidden sm:table-cell' : // CTC
                                             index === 2 ? 'hidden md:table-cell' : // Salary/Month
-                                            index === 3 ? 'hidden lg:table-cell' : // Deduction
-                                            index === 4 ? 'hidden md:table-cell' : // Status
-                                                ''
-                                        }`}
+                                                index === 3 ? 'hidden lg:table-cell' : // Deduction
+                                                    index === 4 ? 'hidden md:table-cell' : // Status
+                                                        ''
+                                            }`}
                                     >
                                         {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                                     </th>
@@ -181,13 +191,12 @@ const PayrollTable = () => {
                                 {row.getVisibleCells().map((cell, index) => (
                                     <td
                                         key={cell.id}
-                                        className={`px-2 sm:px-4 py-2.5 ${
-                                            index === 1 ? 'hidden sm:table-cell' : // CTC
+                                        className={`px-2 sm:px-4 py-2.5 ${index === 1 ? 'hidden sm:table-cell' : // CTC
                                             index === 2 ? 'hidden md:table-cell' : // Salary/Month
-                                            index === 3 ? 'hidden lg:table-cell' : // Deduction
-                                            index === 4 ? 'hidden md:table-cell' : // Status
-                                                ''
-                                        }`}
+                                                index === 3 ? 'hidden lg:table-cell' : // Deduction
+                                                    index === 4 ? 'hidden md:table-cell' : // Status
+                                                        ''
+                                            }`}
                                     >
                                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                     </td>

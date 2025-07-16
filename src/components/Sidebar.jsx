@@ -15,29 +15,58 @@ import {
     Sun,
     Moon,
     X,
-    Menu
+    Menu,
+    Wallet,
+    History,
+    User,
+    CheckSquare
 } from 'lucide-react';
+import { getCurrentUser } from '../utils/mockData';
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
     const [theme, setTheme] = useState('light');
     const navigate = useNavigate();
     const location = useLocation();
+    const currentUser = getCurrentUser();
 
-    const menuItems = [
-        { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-        { icon: Users, label: 'All Employees', path: '/employees' },
-        { icon: DollarSign, label: 'Payroll', path: '/payroll' },
-        // UI Finance role, deposit
-        { icon: Coins, label: 'Deposit', path: '/deposit' },
-        
-        // { icon: Building2, label: 'All Departments', path: '/departments' },
-        // { icon: Clock, label: 'Attendance', path: '/attendance' },
-        // { icon: Briefcase, label: 'Jobs', path: '/jobs' },
-        // { icon: UserCheck, label: 'Candidates', path: '/candidates' },
-        // { icon: FileText, label: 'Leaves', path: '/leaves' },
-        // { icon: Calendar, label: 'Holidays', path: '/holidays' },
-        // { icon: Settings, label: 'Settings', path: '/settings' },
-    ];
+    // Define menu items based on user role
+    const getMenuItems = () => {
+        if (!currentUser) {
+            return [
+                { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' }
+            ];
+        }
+
+        if (currentUser.roles === 'employee') {
+            return [
+                { icon: LayoutDashboard, label: 'Dashboard', path: '/employee/dashboard' },
+                { icon: User, label: 'My Profile', path: '/employees/detail' },
+                { icon: Wallet, label: 'My Wallet', path: '/employee/wallet' },
+                { icon: History, label: 'Salary History', path: '/employee/salary-history' }
+            ];
+        }
+
+        if (currentUser.roles === 'accounting') {
+            return [
+                { icon: LayoutDashboard, label: 'Dashboard', path: '/accounting/dashboard' },
+                // { icon: Users, label: 'All Employees', path: '/employees' },
+                { icon: CheckSquare, label: 'Payroll Approval', path: '/accounting/payroll-approval' },
+                { icon: Coins, label: 'Deposit Funds', path: '/accounting/deposit' },
+                { icon: Wallet, label: 'Company Wallet', path: '/accounting/company-wallet' },
+                { icon: History, label: 'Transactions', path: '/accounting/transactions' }
+            ];
+        }
+
+        // Default menu for other roles
+        return [
+            { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+            { icon: Users, label: 'All Employees', path: '/employees' },
+            { icon: DollarSign, label: 'Payroll', path: '/payroll' },
+            { icon: Coins, label: 'Deposit', path: '/deposit' }
+        ];
+    };
+
+    const menuItems = getMenuItems();
 
     const handleMenuClick = (path) => {
         navigate(path);
@@ -116,7 +145,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                                 <span className="text-sm font-bold text-violet-500">C</span>
                             </div>
                         </div>
-                        <span className="text-lg font-semibold text-zinc-900 font-lexend">CRM</span>
+                        <span className="text-lg font-semibold text-zinc-900 font-lexend">CRM Onchain</span>
                     </div>
                 </div>
 

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -7,6 +6,8 @@ import * as Yup from 'yup';
 
 import InputFieldAuth from '../components/Form/InputFieldAuth';
 import InputFieldPW from '../components/Form/InputFieldPW';
+import WalletConnector from '../components/wallet/WalletConnector';
+import { authenticateUser } from '../utils/mockData';
 
 const loginSchema = Yup.object().shape({
     email: Yup.string().required('Email is required').email('Invalid email format'),
@@ -14,7 +15,6 @@ const loginSchema = Yup.object().shape({
 });
 
 const Login = () => {
-    const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(true);
     const navigate = useNavigate();
     // Form handling
@@ -33,6 +33,30 @@ const Login = () => {
         const isValid = await loginForm.trigger();
         if (!isValid) return;
 
+        // Get form values
+        const formData = loginForm.getValues();
+
+        // Authenticate user with mock data
+        const authResult = authenticateUser(formData.email, formData.password);
+
+        if (authResult) {
+            // Redirect based on user role
+            if (authResult.user.roles === 'employee') {
+                navigate('/employee/dashboard');
+            } else if (authResult.user.roles === 'accounting') {
+                navigate('/accounting/dashboard');
+            } else {
+                navigate('/dashboard');
+            }
+        } else {
+            // Show error message
+            alert('Invalid email or password');
+        }
+    };
+
+    const handleWalletConnect = (walletInfo) => {
+        console.log('Wallet connected:', walletInfo);
+        // For demo, just redirect to dashboard
         navigate('/dashboard');
     };
 
@@ -132,6 +156,28 @@ const Login = () => {
                         >
                             Login
                         </button>
+
+                        {/* OR divider */}
+                        <div className="flex items-center my-6">
+                            <div className="flex-1 border-t border-gray-300"></div>
+                            <div className="mx-4 text-sm text-gray-500 font-lexend">OR</div>
+                            <div className="flex-1 border-t border-gray-300"></div>
+                        </div>
+
+                        {/* Wallet Connection */}
+                        <WalletConnector
+                            onConnect={handleWalletConnect}
+                            className="justify-center w-full"
+                        />
+
+                        {/* Demo Account Info */}
+                        <div className="p-4 mt-6 border border-blue-200 rounded-lg bg-blue-50">
+                            <h4 className="mb-2 font-semibold text-blue-800 font-lexend">Demo Accounts:</h4>
+                            <div className="space-y-1 text-sm text-blue-700 font-lexend">
+                                <div><strong>Employee:</strong> employee@demo.com / password123</div>
+                                <div><strong>Accounting:</strong> accounting@demo.com / password123</div>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>

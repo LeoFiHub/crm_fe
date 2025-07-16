@@ -11,11 +11,13 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
+    "@metamask/sdk": "^0.33.0",
     "@tailwindcss/forms": "^0.5.10",
     "@tanstack/react-table": "^8.21.3",
     "antd": "^5.26.4",
     "autoprefixer": "^10.4.21",
     "axios": "^1.10.0",
+    "bignumber.js": "^9.3.1",
     "ethers": "^6.15.0",
     "lucide-react": "^0.525.0",
     "postcss": "^8.5.6",
@@ -25,6 +27,7 @@
     "react-router-dom": "^7.6.3",
     "react-toastify": "^11.0.5",
     "tailwindcss": "^3.4.17",
+    "web3": "^4.16.0",
     "yup": "^1.6.1"
   },
   "devDependencies": {

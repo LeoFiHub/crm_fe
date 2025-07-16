@@ -26,7 +26,7 @@ const DetailEmployee = () => {
 
                     {/* Content Area */}
                     <div className="flex-1 p-4 sm:p-6">
-                        <div className="mb-6 sm:mb-8">
+                        {/* <div className="mb-6 sm:mb-8">
                             <div className="flex items-center gap-4 mb-4">
                                 <button
                                     onClick={handleBackToEmployees}
@@ -44,7 +44,7 @@ const DetailEmployee = () => {
                                     </p>
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
 
                         {/* Employee Table */}
                         <div className="overflow-hidden bg-white border rounded-lg border-zinc-400/20">
