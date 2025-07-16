@@ -35,7 +35,7 @@ export class WalletManager {
     }
 
     // Connect to wallet
-    async connectWallet(walletType = 'metamask') {        
+    async connectWallet(walletType = 'metamask') {
         if (this.isConnecting) {
             console.log('Already connecting to a wallet, please wait...');
             return null;
@@ -125,16 +125,16 @@ export class WalletManager {
 
         } catch (error) {
             console.error('MetaMask connection error:', error);
-            
+
             // Handle specific MetaMask errors
             if (error.code === -32002) {
                 throw new Error('MetaMask is already processing a connection request. Please check your MetaMask extension.');
             }
-            
+
             if (error.code === 4001) {
                 throw new Error('User rejected the connection request.');
             }
-            
+
             throw new Error(`Failed to connect MetaMask: ${error.message}`);
         }
     }
@@ -148,7 +148,7 @@ export class WalletManager {
         try {
             // Request connection to Petra
             const response = await window.aptos.connect();
-            
+
             if (!response || !response.address) {
                 throw new Error('Failed to get account from Petra Wallet');
             }

@@ -7,13 +7,13 @@ const Header = ({
     greeting = "Good Morning",
     onMenuClick
 }) => {
-    const { 
-        isConnected, 
-        walletAddress, 
-        walletType, 
-        connectWallet, 
-        disconnectWallet, 
-        isConnecting 
+    const {
+        isConnected,
+        walletAddress,
+        walletType,
+        connectWallet,
+        disconnectWallet,
+        isConnecting
     } = useWallet();
 
     const formatAddress = (address) => {

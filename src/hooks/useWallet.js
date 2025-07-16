@@ -50,7 +50,7 @@ export const useWallet = () => {
             console.log('Already connecting, ignoring this call');
             return null;
         }
-        
+
         setIsConnecting(true);
         setError(null);
 
@@ -64,11 +64,11 @@ export const useWallet = () => {
             // Auto-detect available wallets if no type specified
             if (!preferredType) {
                 const availableWallets = walletManager.detectWallets();
-                
+
                 // Prefer MetaMask if available, otherwise use first supported wallet
                 const metamaskWallet = availableWallets.find(w => w.type === 'metamask');
                 const petraWallet = availableWallets.find(w => w.type === 'petra');
-                
+
                 if (metamaskWallet && metamaskWallet.available) {
                     preferredType = 'metamask';
                 } else if (petraWallet && petraWallet.available) {

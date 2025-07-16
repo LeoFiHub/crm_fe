@@ -7,18 +7,20 @@ Petra Wallet là ví chính thức của Aptos blockchain. Để tích hợp ho�
 ## 🔗 Blockchain Networks Support
 
 ### 1. **MetaMask - Ethereum Network**
+
 - **Network**: Ethereum, Polygon, BSC, etc.
 - **Token Standard**: ERC-20, ERC-721, ERC-1155
 - **Integration**: Đã có trong `walletManager.js`
 
 ### 2. **Petra Wallet - Aptos Network**
+
 - **Network**: Aptos Mainnet/Testnet/Devnet
 - **Token Standard**: Aptos Coin (APT), Custom Tokens
 - **Integration**: Đã thêm vào `walletManager.js`
 
 ## 📦 Frontend Dependencies
 
-### Cần thêm vào package.json:
+### Cần thêm vào package.json
 
 ```json
 {
@@ -30,7 +32,8 @@ Petra Wallet là ví chính thức của Aptos blockchain. Để tích hợp ho�
 }
 ```
 
-### Cài đặt:
+### Cài đặt
+
 ```bash
 npm install @aptos-labs/wallet-adapter-core @aptos-labs/wallet-adapter-petra aptos
 ```
@@ -39,13 +42,15 @@ npm install @aptos-labs/wallet-adapter-core @aptos-labs/wallet-adapter-petra apt
 
 ### 1. Database Schema Updates
 
-#### Users Table - Thêm support cho multiple wallets:
+#### Users Table - Thêm support cho multiple wallets
+
 ```sql
 ALTER TABLE users ADD COLUMN aptos_wallet_address VARCHAR(66) NULL;
 ALTER TABLE users ADD COLUMN preferred_network ENUM('ethereum', 'aptos') DEFAULT 'ethereum';
 ```
 
-#### Wallets Table - Mới:
+#### Wallets Table - Mới
+
 ```sql
 CREATE TABLE user_wallets (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -61,7 +66,8 @@ CREATE TABLE user_wallets (
 );
 ```
 
-#### Transactions Table - Cập nhật:
+#### Transactions Table - Cập nhật
+
 ```sql
 ALTER TABLE transactions ADD COLUMN network_type ENUM('ethereum', 'aptos') NOT NULL DEFAULT 'ethereum';
 ALTER TABLE transactions ADD COLUMN aptos_transaction_hash VARCHAR(66) NULL;
@@ -348,24 +354,28 @@ const addUserWallet = async (req, res) => {
 ## 📋 Implementation Timeline
 
 ### Phase 1: Database Updates (1 day)
+
 - [ ] Add Aptos wallet columns to users table
 - [ ] Create user_wallets table
 - [ ] Update transactions table for multi-network
 - [ ] Database migration scripts
 
 ### Phase 2: Backend Services (2 days)
+
 - [ ] Implement AptosService
 - [ ] Create MultiChainService
 - [ ] Update existing controllers
 - [ ] Add new API endpoints
 
 ### Phase 3: Frontend Integration (1 day)
+
 - [ ] Install Aptos dependencies
 - [ ] Test Petra wallet connection
 - [ ] Update UI for multi-wallet support
 - [ ] Testing and debugging
 
 ### Phase 4: Testing & Documentation (1 day)
+
 - [ ] End-to-end testing
 - [ ] API documentation updates
 - [ ] User guide for wallet switching
@@ -373,6 +383,7 @@ const addUserWallet = async (req, res) => {
 ## 🔒 Security Considerations
 
 ### 1. Private Key Management
+
 ```javascript
 // Sử dụng encrypted storage hoặc KMS cho production
 const crypto = require('crypto');
@@ -386,6 +397,7 @@ const encryptPrivateKey = (privateKey, password) => {
 ```
 
 ### 2. Transaction Validation
+
 ```javascript
 const validateAptosTransaction = async (txHash) => {
     const txDetails = await aptosService.getTransactionDetails(txHash);
@@ -407,10 +419,10 @@ const validateAptosTransaction = async (txHash) => {
 
 ## 📞 Support Links
 
-- **MetaMask**: https://metamask.io/download/
-- **Petra Wallet**: https://petra.app/
-- **Aptos Documentation**: https://aptos.dev/
-- **Aptos SDK**: https://www.npmjs.com/package/aptos
+- **MetaMask**: <https://metamask.io/download/>
+- **Petra Wallet**: <https://petra.app/>
+- **Aptos Documentation**: <https://aptos.dev/>
+- **Aptos SDK**: <https://www.npmjs.com/package/aptos>
 
 ---
 
