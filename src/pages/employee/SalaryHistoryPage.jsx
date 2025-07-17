@@ -1,31 +1,49 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Download, ExternalLink, Filter } from 'lucide-react';
 
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
-import { getCurrentUser, mockPayrollSchedule, mockTransactions } from '../../utils/mockData';
+import { getCurrentUser } from '../../utils/mockData';
+import { getPayrollByEmployeeId } from '../../api/payroll';
 
 const SalaryHistoryPage = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [selectedFilter, setSelectedFilter] = useState('all');
     const navigate = useNavigate();
     const currentUser = getCurrentUser();
+    const [payrollSchedules, setPayrollSchedules] = useState([]);
+
+    // get payroll schedule for current user vs real api getPayrollByEmployeeId
+    useEffect(() => {
+        if (!currentUser || currentUser.role !== 'employee') {
+            // Don't fetch if not logged in or not employee
+            return;
+        }
+        const fetchPayrollSchedule = async () => {
+            try {
+                const response = await getPayrollByEmployeeId(currentUser.id);
+                // Handle the response and update state
+                setPayrollSchedules(response.data.data || []);
+            } catch (error) {
+                console.error('Error fetching payroll schedule:', error);
+            }
+        };
+
+        fetchPayrollSchedule();
+    }, []);
+
+    console.log('Payroll Schedule:', payrollSchedules);
 
     if (!currentUser || currentUser.role !== 'employee') {
         navigate('/login');
         return null;
     }
 
-    // Filter salary history for current user
-    const userSalaryHistory = mockPayrollSchedule.filter(p => p.id_employee === currentUser.id);
-    const userTransactions = mockTransactions.filter(tx =>
-        tx.employee_name === currentUser.fullName && tx.type === 'payroll'
-    );
-
+    // Filter salary history for current user (dùng data từ API)
     const filteredHistory = selectedFilter === 'all'
-        ? userSalaryHistory
-        : userSalaryHistory.filter(p => p.status === selectedFilter);
+        ? payrollSchedules
+        : payrollSchedules.filter(p => p.status === selectedFilter);
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -75,7 +93,7 @@ const SalaryHistoryPage = () => {
                         <div className="grid grid-cols-1 gap-6 mb-6 md:grid-cols-3">
                             <div className="p-6 bg-white border border-gray-200 rounded-lg">
                                 <div className="text-2xl font-bold text-green-600 font-lexend">
-                                    {userSalaryHistory.filter(p => p.status === 'paid').length}
+                                    {payrollSchedules.filter(p => p.status === 'paid').length}
                                 </div>
                                 <div className="text-sm text-gray-600 font-lexend">
                                     Payments Received
@@ -84,7 +102,7 @@ const SalaryHistoryPage = () => {
 
                             <div className="p-6 bg-white border border-gray-200 rounded-lg">
                                 <div className="text-2xl font-bold text-blue-600 font-lexend">
-                                    ${userSalaryHistory
+                                    ${payrollSchedules
                                         .filter(p => p.status === 'paid')
                                         .reduce((sum, p) => sum + p.amount, 0)
                                         .toLocaleString()}
@@ -96,7 +114,7 @@ const SalaryHistoryPage = () => {
 
                             <div className="p-6 bg-white border border-gray-200 rounded-lg">
                                 <div className="text-2xl font-bold text-orange-600 font-lexend">
-                                    {userSalaryHistory.filter(p => p.status === 'pending').length}
+                                    {payrollSchedules.filter(p => p.status === 'pending').length}
                                 </div>
                                 <div className="text-sm text-gray-600 font-lexend">
                                     Pending Payments
@@ -125,7 +143,35 @@ const SalaryHistoryPage = () => {
                                     </select>
                                 </div>
 
-                                <button className="flex items-center gap-2 px-4 py-2 text-white transition-colors bg-indigo-500 rounded-lg hover:bg-indigo-600 font-lexend">
+                                <button
+                                    className="flex items-center gap-2 px-4 py-2 text-white transition-colors bg-indigo-500 rounded-lg hover:bg-indigo-600 font-lexend"
+                                    onClick={() => {
+                                        // Tạo CSV header
+                                        const header = ['Pay Date', 'Amount', 'Currency', 'Status', 'Employee Name'];
+                                        // Map data
+                                        const rows = payrollSchedules.map(p => [
+                                            p.payday,
+                                            p.amount,
+                                            p.stablecoin_type,
+                                            p.status,
+                                            p.employee?.fullName || ''
+                                        ]);
+                                        // Convert to CSV string
+                                        const csvContent = [header, ...rows]
+                                            .map(row => row.map(val => `"${val ?? ''}"`).join(','))
+                                            .join('\n');
+                                        // Download
+                                        const blob = new Blob([csvContent], { type: 'text/csv' });
+                                        const url = URL.createObjectURL(blob);
+                                        const a = document.createElement('a');
+                                        a.href = url;
+                                        a.download = 'salary_history.csv';
+                                        document.body.appendChild(a);
+                                        a.click();
+                                        document.body.removeChild(a);
+                                        URL.revokeObjectURL(url);
+                                    }}
+                                >
                                     <Download className="w-4 h-4" />
                                     Export CSV
                                 </button>
@@ -225,7 +271,7 @@ const SalaryHistoryPage = () => {
                         </div>
 
                         {/* Recent Transactions */}
-                        {userTransactions.length > 0 && (
+                        {/* {userTransactions.length > 0 && (
                             <div className="p-6 mt-6 bg-white border border-gray-200 rounded-lg">
                                 <h2 className="mb-4 text-lg font-semibold text-gray-900 font-lexend">
                                     Recent Transaction Details
@@ -269,7 +315,7 @@ const SalaryHistoryPage = () => {
                                     ))}
                                 </div>
                             </div>
-                        )}
+                        )} */}
                     </div>
                 </div>
             </div>

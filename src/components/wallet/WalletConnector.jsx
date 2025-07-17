@@ -34,12 +34,12 @@ const WalletConnector = ({ onConnect, onDisconnect, className = '' }) => {
 
     const availableWallets = getAvailableWallets();
 
-    console.log('WalletConnector - Available wallets:', availableWallets);
+    // console.log('WalletConnector - Available wallets:', availableWallets);
 
     if (isConnected) {
         return (
             <div className={`flex items-center gap-3 ${className}`}>
-                <div className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center gap-2 px-3 py-2 border border-green-200 rounded-lg bg-green-50">
                     <CheckCircle className="w-4 h-4 text-green-500" />
                     <span className="text-sm font-medium text-green-700">
                         {walletType === 'metamask' ? '🦊' : walletType === 'petra' ? '🔴' : '💰'} {formatAddress(walletAddress)}
@@ -47,7 +47,7 @@ const WalletConnector = ({ onConnect, onDisconnect, className = '' }) => {
                 </div>
                 <button
                     onClick={handleDisconnect}
-                    className="px-3 py-2 text-sm font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
+                    className="px-3 py-2 text-sm font-medium text-red-600 transition-colors border border-red-200 rounded-lg hover:bg-red-50"
                 >
                     Disconnect
                 </button>
@@ -72,7 +72,7 @@ const WalletConnector = ({ onConnect, onDisconnect, className = '' }) => {
 
             {/* Error display */}
             {error && (
-                <div className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 border border-red-200 rounded-lg bg-red-50">
                     <AlertCircle className="w-4 h-4" />
                     {error}
                 </div>
@@ -81,8 +81,8 @@ const WalletConnector = ({ onConnect, onDisconnect, className = '' }) => {
             {/* Wallet Selection Modal */}
             {showWalletModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    <div className="w-full max-w-md p-6 mx-4 bg-white rounded-xl">
+                        <h3 className="mb-4 text-lg font-semibold text-gray-900">
                             Connect Your Wallet
                         </h3>
 
@@ -108,10 +108,10 @@ const WalletConnector = ({ onConnect, onDisconnect, className = '' }) => {
                                     key={wallet.type}
                                     onClick={() => wallet.available ? handleConnect(wallet.type) : window.open(wallet.downloadUrl, '_blank')}
                                     disabled={isConnecting}
-                                    className="w-full flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:border-indigo-300 hover:bg-indigo-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex items-center w-full gap-3 p-4 transition-colors border border-gray-200 rounded-lg hover:border-indigo-300 hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <span className="text-2xl">{wallet.icon}</span>
-                                    <div className="text-left flex-1">
+                                    <div className="flex-1 text-left">
                                         <div className="font-medium text-gray-900">
                                             {wallet.name}
                                         </div>
@@ -120,12 +120,12 @@ const WalletConnector = ({ onConnect, onDisconnect, className = '' }) => {
                                         </div>
                                     </div>
                                     {wallet.available ? (
-                                        <div className="text-green-500 text-sm font-medium">Ready</div>
+                                        <div className="text-sm font-medium text-green-500">Ready</div>
                                     ) : (
-                                        <div className="text-blue-500 text-sm font-medium">Install</div>
+                                        <div className="text-sm font-medium text-blue-500">Install</div>
                                     )}
                                     {isConnecting && (
-                                        <Loader2 className="w-4 h-4 animate-spin ml-auto" />
+                                        <Loader2 className="w-4 h-4 ml-auto animate-spin" />
                                     )}
                                 </button>
                             ))}
@@ -134,7 +134,7 @@ const WalletConnector = ({ onConnect, onDisconnect, className = '' }) => {
                         <div className="flex justify-end gap-3 mt-6">
                             <button
                                 onClick={() => setShowWalletModal(false)}
-                                className="px-4 py-2 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                                className="px-4 py-2 text-gray-600 transition-colors border border-gray-200 rounded-lg hover:bg-gray-50"
                             >
                                 Cancel
                             </button>

@@ -10,12 +10,12 @@ export class WalletManager {
     detectWallets() {
         const wallets = [];
 
-        console.log('Detecting wallets...');
-        console.log('window.ethereum:', typeof window !== 'undefined' ? !!window.ethereum : false);
-        console.log('window.ethereum.isMetaMask:', typeof window !== 'undefined' ? !!window.ethereum?.isMetaMask : false);
-        console.log('window.aptos:', typeof window !== 'undefined' ? !!window.aptos : false);
-        console.log('window.petra:', typeof window !== 'undefined' ? !!window.petra : false);
-        console.log('window.martian:', typeof window !== 'undefined' ? !!window.martian : false);
+        // console.log('Detecting wallets...');
+        // console.log('window.ethereum:', typeof window !== 'undefined' ? !!window.ethereum : false);
+        // console.log('window.ethereum.isMetaMask:', typeof window !== 'undefined' ? !!window.ethereum?.isMetaMask : false);
+        // console.log('window.aptos:', typeof window !== 'undefined' ? !!window.aptos : false);
+        // console.log('window.petra:', typeof window !== 'undefined' ? !!window.petra : false);
+        // console.log('window.martian:', typeof window !== 'undefined' ? !!window.martian : false);
 
         // Check for MetaMask
         if (typeof window !== 'undefined' && window.ethereum?.isMetaMask) {
@@ -43,7 +43,7 @@ export class WalletManager {
             });
         }
 
-        console.log('Detected wallets:', wallets);
+        // console.log('Detected wallets:', wallets);
         // Only return supported wallet types
         return wallets;
     }

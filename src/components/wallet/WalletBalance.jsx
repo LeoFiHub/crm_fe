@@ -15,7 +15,7 @@ const WalletBalance = ({ showActions = true, compact = false }) => {
 
     if (!isConnected || !balance) {
         return (
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
                 <div className="text-center text-gray-500">
                     <DollarSign className="w-8 h-8 mx-auto mb-2 opacity-50" />
                     <p className="text-sm">Wallet not connected</p>
@@ -59,12 +59,12 @@ const WalletBalance = ({ showActions = true, compact = false }) => {
     }
 
     return (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="p-6 bg-white border border-gray-200 rounded-lg">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h3 className="text-lg font-semibold text-gray-900">Wallet Balance</h3>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="mt-1 text-sm text-gray-500">
                         {walletAddress ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : ''}
                     </p>
                 </div>
@@ -72,14 +72,14 @@ const WalletBalance = ({ showActions = true, compact = false }) => {
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => setShowBalance(!showBalance)}
-                            className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-50"
+                            className="p-2 text-gray-400 rounded-lg hover:text-gray-600 hover:bg-gray-50"
                         >
-                            {showBalance ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            {!showBalance ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                         <button
                             onClick={handleRefresh}
                             disabled={isRefreshing}
-                            className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                            className="p-2 text-gray-400 rounded-lg hover:text-gray-600 hover:bg-gray-50 disabled:opacity-50"
                         >
                             <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
                         </button>
@@ -88,7 +88,7 @@ const WalletBalance = ({ showActions = true, compact = false }) => {
             </div>
 
             {/* Balance Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {currencies.map(({ symbol, name, color, bgColor }) => (
                     <div key={symbol} className={`${bgColor} rounded-lg p-4`}>
                         <div className="flex items-center justify-between">
@@ -96,7 +96,7 @@ const WalletBalance = ({ showActions = true, compact = false }) => {
                                 <div className={`text-sm font-medium ${color}`}>
                                     {symbol}
                                 </div>
-                                <div className="text-xs text-gray-500 mt-1">
+                                <div className="mt-1 text-xs text-gray-500">
                                     {name}
                                 </div>
                             </div>
@@ -104,7 +104,7 @@ const WalletBalance = ({ showActions = true, compact = false }) => {
                                 <div className="font-semibold text-gray-900">
                                     {showBalance ? balance[symbol] || '0.00' : '****'}
                                 </div>
-                                <div className="text-xs text-gray-500 mt-1">
+                                <div className="mt-1 text-xs text-gray-500">
                                     {symbol}
                                 </div>
                             </div>
@@ -114,7 +114,7 @@ const WalletBalance = ({ showActions = true, compact = false }) => {
             </div>
 
             {/* Total Value */}
-            <div className="mt-6 pt-4 border-t border-gray-200">
+            <div className="pt-4 mt-6 border-t border-gray-200">
                 <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-gray-600">
                         Total Portfolio Value

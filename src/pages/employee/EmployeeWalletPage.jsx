@@ -220,7 +220,7 @@ const EmployeeWalletPage = () => {
                         )}
 
                         {/* Recent Transactions */}
-                        <div className="p-6 bg-white border border-gray-200 rounded-lg">
+                        {/* <div className="p-6 bg-white border border-gray-200 rounded-lg">
                             <h2 className="mb-4 text-xl font-semibold text-zinc-900 font-lexend">
                                 Recent Transactions
                             </h2>
@@ -273,7 +273,7 @@ const EmployeeWalletPage = () => {
                                     <p className="text-gray-500 font-lexend">No transactions yet</p>
                                 </div>
                             )}
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>

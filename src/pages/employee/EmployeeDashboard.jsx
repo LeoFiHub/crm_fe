@@ -191,7 +191,7 @@ const EmployeeDashboard = () => {
                         </div>
 
                         {/* Recent Activity */}
-                        <div className="p-6 bg-white border border-gray-200 rounded-lg">
+                        {/* <div className="p-6 bg-white border border-gray-200 rounded-lg">
                             <h2 className="mb-4 text-xl font-semibold text-zinc-900 font-lexend">
                                 Recent Activity
                             </h2>
@@ -233,7 +233,7 @@ const EmployeeDashboard = () => {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>
