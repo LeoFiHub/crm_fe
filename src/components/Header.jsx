@@ -1,13 +1,18 @@
 import { Search, Bell, ChevronDown, Menu } from 'lucide-react';
 import WalletConnector from './wallet/WalletConnector';
 import WalletDebugComponent from './wallet/WalletDebugComponent';
+import { useAuth } from '../contexts/AuthContext';
 
 const Header = ({
-    userName = "Robert Allen",
-    userRole = "Accounting Manager",
     greeting = "Good Morning",
     onMenuClick
 }) => {
+    const { user } = useAuth();
+
+    const userName = user?.fullName || "User";
+    const userRole = user?.role === 'employee' ? 'Employee' :
+        user?.role === 'accounting' ? 'Accounting Manager' : 'User';
+
     return (
         <div className="w-full px-4 py-4 bg-white border-b border-zinc-400/20 sm:px-6">
             <div className="flex items-center justify-between">
@@ -23,11 +28,11 @@ const Header = ({
 
                     {/* Greeting */}
                     <div className="flex flex-col">
-                        <div className="text-lg font-semibold leading-loose text-zinc-900 sm:text-xl font-lexend">
+                        {/* <div className="text-lg font-semibold leading-loose text-zinc-900 sm:text-xl font-lexend">
                             Hello {userName.split(' ')[0]} 👋🏻
-                        </div>
+                        </div> */}
                         <div className="text-xs font-light leading-snug text-zinc-400 sm:text-sm font-lexend">
-                            {greeting}
+                            🔆 {greeting} 👋🏻
                         </div>
                     </div>
                 </div>

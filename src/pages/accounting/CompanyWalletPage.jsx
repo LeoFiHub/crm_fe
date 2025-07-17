@@ -22,7 +22,7 @@ const CompanyWalletPage = () => {
         setTimeout(() => setIsRefreshing(false), 1500);
     };
 
-    if (!currentUser || currentUser.roles !== 'accounting') {
+    if (!currentUser || currentUser.role !== 'accounting') {
         navigate('/login');
         return null;
     }

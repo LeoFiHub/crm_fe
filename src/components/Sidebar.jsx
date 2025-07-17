@@ -21,13 +21,13 @@ import {
     User,
     CheckSquare
 } from 'lucide-react';
-import { getCurrentUser } from '../utils/mockData';
+import { useAuth } from '../contexts/AuthContext';
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
     const [theme, setTheme] = useState('light');
     const navigate = useNavigate();
     const location = useLocation();
-    const currentUser = getCurrentUser();
+    const { user: currentUser } = useAuth();
 
     // Define menu items based on user role
     const getMenuItems = () => {
@@ -37,16 +37,16 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             ];
         }
 
-        if (currentUser.roles === 'employee') {
+        if (currentUser.role === 'employee') {
             return [
                 { icon: LayoutDashboard, label: 'Dashboard', path: '/employee/dashboard' },
-                { icon: User, label: 'My Profile', path: '/employees/detail' },
+                { icon: User, label: 'My Profile', path: '/employee/profile' },
                 { icon: Wallet, label: 'My Wallet', path: '/employee/wallet' },
                 { icon: History, label: 'Salary History', path: '/employee/salary-history' }
             ];
         }
 
-        if (currentUser.roles === 'accounting') {
+        if (currentUser.role === 'accounting') {
             return [
                 { icon: LayoutDashboard, label: 'Dashboard', path: '/accounting/dashboard' },
                 // { icon: Users, label: 'All Employees', path: '/employees' },

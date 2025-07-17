@@ -7,7 +7,9 @@ import * as Yup from 'yup';
 import InputFieldAuth from '../components/Form/InputFieldAuth';
 import InputFieldPW from '../components/Form/InputFieldPW';
 import WalletConnector from '../components/wallet/WalletConnector';
-import { authenticateUser } from '../utils/mockData';
+import { authenticateUser } from '../api/auth';
+import { useAuth } from '../contexts/AuthContext';
+// import { authenticateUser } from '../utils/mockData';
 
 const loginSchema = Yup.object().shape({
     email: Yup.string().required('Email is required').email('Invalid email format'),
@@ -17,6 +19,8 @@ const loginSchema = Yup.object().shape({
 const Login = () => {
     const [rememberMe, setRememberMe] = useState(true);
     const navigate = useNavigate();
+    const { login } = useAuth();
+
     // Form handling
     const loginForm = useForm({
         resolver: yupResolver(loginSchema),
@@ -33,24 +37,36 @@ const Login = () => {
         const isValid = await loginForm.trigger();
         if (!isValid) return;
 
-        // Get form values
-        const formData = loginForm.getValues();
+        try {
+            // Get form values
+            const formData = loginForm.getValues();
 
-        // Authenticate user with mock data
-        const authResult = authenticateUser(formData.email, formData.password);
+            // Authenticate user
+            const response = await authenticateUser(formData);
+            console.log("Res", response)
+            console.log(response.data.success, response.data.data)
+            if (response.data.success && response.data.data) {
+                const userData = response.data.data;
+                const token = response.data.data.token;
 
-        if (authResult) {
-            // Redirect based on user role
-            if (authResult.user.roles === 'employee') {
-                navigate('/employee/dashboard');
-            } else if (authResult.user.roles === 'accounting') {
-                navigate('/accounting/dashboard');
+                // Use AuthContext login method
+                login(userData, token);
+
+                // Redirect based on user role
+                if (userData.role === 'employee') {
+                    navigate('/employee/dashboard');
+                } else if (userData.role === 'accounting') {
+                    navigate('/accounting/dashboard');
+                } else {
+                    navigate('/dashboard');
+                }
             } else {
-                navigate('/dashboard');
+                // Show error message
+                alert('Invalid email or password');
             }
-        } else {
-            // Show error message
-            alert('Invalid email or password');
+        } catch (error) {
+            console.error('Login error:', error);
+            alert('Login failed. Please try again.');
         }
     };
 
@@ -111,7 +127,6 @@ const Login = () => {
                             label="Email Address"
                             placeholder="robertallen@example.com"
                             type="email"
-                            defaultValues="robertallen@example.com"
                             {...loginForm.register('email')}
                             error={loginForm.formState.errors.email?.message}
                         />
@@ -174,8 +189,8 @@ const Login = () => {
                         <div className="p-4 mt-6 border border-blue-200 rounded-lg bg-blue-50">
                             <h4 className="mb-2 font-semibold text-blue-800 font-lexend">Demo Accounts:</h4>
                             <div className="space-y-1 text-sm text-blue-700 font-lexend">
-                                <div><strong>Employee:</strong> employee@demo.com / password123</div>
-                                <div><strong>Accounting:</strong> accounting@demo.com / password123</div>
+                                <div><strong>Employee:</strong> john.smith.employee@company.com / password123</div>
+                                <div><strong>Accounting:</strong> lisa.anderson.accounting@company.com / password123</div>
                             </div>
                         </div>
                     </form>

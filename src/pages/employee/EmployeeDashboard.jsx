@@ -6,13 +6,13 @@ import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
 import WalletBalance from '../../components/wallet/WalletBalance';
 import WalletConnector from '../../components/wallet/WalletConnector';
-import { getCurrentUser, logout } from '../../utils/mockData';
+import { useAuth } from '../../contexts/AuthContext';
 import { useWallet } from '../../hooks/useWallet';
 
 const EmployeeDashboard = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const navigate = useNavigate();
-    const currentUser = getCurrentUser();
+    const { user: currentUser, logout } = useAuth();
     const { isConnected } = useWallet();
 
     const handleLogout = () => {
@@ -24,11 +24,6 @@ const EmployeeDashboard = () => {
         console.log('Wallet connected:', walletInfo);
         // In real app, update user's wallet address in database
     };
-
-    if (!currentUser || currentUser.roles !== 'employee') {
-        navigate('/login');
-        return null;
-    }
 
     const quickActions = [
         {

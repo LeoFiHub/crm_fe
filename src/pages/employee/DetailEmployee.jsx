@@ -1,18 +1,20 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
 import { ProfileEmp } from '../../components/employee/ProfileEmp';
+import { useAuth } from '../../contexts/AuthContext';
 
 const DetailEmployee = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
-    const handleBackToEmployees = () => {
-        navigate('/employees');
-    };
-
+    const { user } = useAuth();
+    
+    console.log(user)
+    
+    // const handleBackToEmployees = () => {
+    //     navigate('/employees');
+    // };
     return (
         <div className="min-h-screen bg-gray-50 lg:flex">
             {/* Sidebar */}
@@ -48,7 +50,7 @@ const DetailEmployee = () => {
 
                         {/* Employee Table */}
                         <div className="overflow-hidden bg-white border rounded-lg border-zinc-400/20">
-                            <ProfileEmp />
+                            <ProfileEmp employeeData={user} />
                         </div>
                     </div>
                 </div>

@@ -5,22 +5,18 @@ import { Users, Wallet, CreditCard, Activity, LogOut, TrendingUp, DollarSign } f
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
 import WalletBalance from '../../components/wallet/WalletBalance';
-import { getCurrentUser, logout, mockPayrollSchedule, mockCompanyWallet } from '../../utils/mockData';
+import { useAuth } from '../../contexts/AuthContext';
+import { mockPayrollSchedule, mockCompanyWallet } from '../../utils/mockData';
 
 const AccountingDashboard = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const navigate = useNavigate();
-    const currentUser = getCurrentUser();
+    const { user: currentUser, logout } = useAuth();
 
     const handleLogout = () => {
         logout();
         navigate('/login');
     };
-
-    if (!currentUser || currentUser.roles !== 'accounting') {
-        navigate('/login');
-        return null;
-    }
 
     // Calculate stats from mock data
     const pendingPayrolls = mockPayrollSchedule.filter(p => p.status === 'pending');
@@ -83,9 +79,9 @@ const AccountingDashboard = () => {
                                     <h1 className="text-3xl font-bold text-zinc-900 font-lexend">
                                         Accounting Dashboard 📊
                                     </h1>
-                                    {/* <p className="mt-2 text-zinc-600 font-lexend">
-                                        {currentUser.fullName} • {currentUser.position}
-                                    </p> */}
+                                    <p className="mt-2 text-zinc-600 font-lexend">
+                                        {currentUser?.fullName} • Accounting Manager
+                                    </p>
                                 </div>
                                 <button
                                     onClick={handleLogout}

@@ -15,7 +15,7 @@ const TransactionHistoryPage = () => {
     const navigate = useNavigate();
     const currentUser = getCurrentUser();
 
-    if (!currentUser || currentUser.roles !== 'accounting') {
+    if (!currentUser || currentUser.role !== 'accounting') {
         navigate('/login');
         return null;
     }

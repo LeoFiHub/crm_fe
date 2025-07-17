@@ -43,7 +43,7 @@ const EmployeeWalletPage = () => {
         }
     };
 
-    if (!currentUser || currentUser.roles !== 'employee') {
+    if (!currentUser || currentUser.role !== 'employee') {
         navigate('/login');
         return null;
     }

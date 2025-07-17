@@ -1,34 +1,177 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
+
+// Status constants
+const STATUS_PENDING = 'Pending';
+const STATUS_APPROVED = 'Approved';
+const STATUS_PAID = 'Paid';
+const STATUS_REJECTED = 'Rejected';
 import { useReactTable, getCoreRowModel, getPaginationRowModel, getFilteredRowModel, flexRender } from '@tanstack/react-table';
 import { ChevronDown, ExternalLink } from 'lucide-react';
+// import { use } from 'react';
+import { getPayrolls, approvePayroll } from '../../api/payroll';
+import { toast } from 'react-toastify';
 
 const PayrollTable = () => {
     const [globalFilter, setGlobalFilter] = useState('');
+    const [payrolls, setPayrolls] = useState();
+    const [selectedStatus, setSelectedStatus] = useState('all');
+    const [selectedStablecoin, setSelectedStablecoin] = useState('all');
+    const [selectedDateRange, setSelectedDateRange] = useState('all'); // 'all', 'today', '7days', '30days'
+    // Side effect to call get all payrolls
+    useEffect(() => {
+        const fetchPayrolls = async () => {
+            const res = await getPayrolls();
+            setPayrolls(res.data.data);
+        };
+
+        fetchPayrolls();
+    }, []);
+
+    if (payrolls) {
+        console.log(payrolls)
+    }
+
+    // ============== Side effect ==============
+    const handleApprove = useCallback(async (id) => {
+        try {
+            console.log('Approve clicked for ID:', id);
+
+            if (!payrolls) {
+                console.log('No payrolls data');
+                return;
+            }
+
+            // Lấy bản ghi payroll cần update trước khi setPayrolls
+            const currentPayroll = payrolls.find(p => p.id === id);
+            console.log('Current payroll:', currentPayroll);
+
+            if (!currentPayroll) {
+                console.log('Payroll not found');
+                return;
+            }
+
+            // Kiểm tra status từ backend (chữ thường)
+            if (currentPayroll.status === 'paid' || currentPayroll.status === 'approved') {
+                console.log('Payroll already processed:', currentPayroll.status);
+                return;
+            }
+
+            // Tạo object để gửi API (status backend là chữ thường)
+            const updatedPayrollForAPI = {
+                ...currentPayroll,
+                status: 'approved' // Gửi chữ thường cho backend
+            };
+
+            console.log('Sending to API:', updatedPayrollForAPI);
+
+            // Gọi API approve chuyên dụng
+            await approvePayroll(id);
+
+            // Cập nhật state với status chữ thường (để mapping đúng)
+            setPayrolls(prev => prev.map(p =>
+                p.id === id ? { ...p, status: 'approved' } : p
+            ));
+
+            toast.success('Payroll approved successfully');
+        } catch (error) {
+            toast.error('Failed to approve payroll');
+            console.error('Error approving payroll:', error);
+        }
+    }, [payrolls]);
 
     // Memoized data for payroll (updated fields)
-    const data = useMemo(
-        () => [
-            {
-                id: 1,
-                fullname: 'Nguyen Van A',
-                dob: '1990-01-15',
-                walletAddress: '0x1234abcd5678efgh9012ijkl3456mnop7890qrst',
-                amount: 500000,
-                stablecoin_type: 'USDT',
-                Status: 'Pending',
-            },
-            {
-                id: 2,
-                fullname: 'Tran Thi B',
-                dob: '1988-05-22',
-                walletAddress: '0xabcd1234efgh5678ijkl9012mnop3456qrst7890',
-                amount: 600000,
-                stablecoin_type: 'USDC',
-                Status: 'Approved',
-            },
-        ],
-        []
-    );
+    // const data = useMemo(
+    //     () => [
+    //         {
+    //             id: 1,
+    //             fullname: 'Nguyen Van A',
+    //             dob: '1990-01-15',
+    //             walletAddress: '0x1234abcd5678efgh9012ijkl3456mnop7890qrst',
+    //             amount: 500000,
+    //             stablecoin_type: 'USDT',
+    //             status: 'Pending',
+    //         },
+    //         {
+    //             id: 2,
+    //             fullname: 'Tran Thi B',
+    //             dob: '1988-05-22',
+    //             walletAddress: '0xabcd1234efgh5678ijkl9012mnop3456qrst7890',
+    //             amount: 600000,
+    //             stablecoin_type: 'USDC',
+    //             status: 'Approved',
+    //         },
+    //     ],
+    //     []
+    // );
+
+    const data = useMemo(() => {
+        if (!payrolls) return [];
+
+        // Sắp xếp payrolls theo payday tăng dần (cũ nhất trước)
+        const sortedPayrolls = [...payrolls].sort((a, b) => new Date(a.payday) - new Date(b.payday));
+
+        const mappedData = sortedPayrolls.map((p) => {
+            let status = '';
+            switch (p.status?.toLowerCase()) {
+                case 'approved':
+                    status = STATUS_APPROVED;
+                    break;
+                case 'paid':
+                    status = STATUS_PAID;
+                    break;
+                case 'rejected':
+                    status = STATUS_REJECTED;
+                    break;
+                case 'pending':
+                default:
+                    status = STATUS_PENDING;
+            }
+            return {
+                id: p.id,
+                fullname: p.employee?.fullName || '',
+                walletAddress: p.employee?.walletAddress || '',
+                amount: p.amount,
+                stablecoin_type: p.stablecoin_type,
+                status,
+                dob: p.employee?.dateOfBirth ? new Date(p.employee.dateOfBirth).toISOString().split('T')[0] : '',
+                payday: p.payday,
+            };
+        });
+
+        // Date filter logic
+        const now = new Date();
+        const isSameDay = (date1, date2) => {
+            return date1.getFullYear() === date2.getFullYear() &&
+                date1.getMonth() === date2.getMonth() &&
+                date1.getDate() === date2.getDate();
+        };
+
+        return mappedData.filter(item => {
+            const matchesStatus = selectedStatus === 'all' || item.status === selectedStatus;
+            const matchesStablecoin = selectedStablecoin === 'all' || item.stablecoin_type === selectedStablecoin;
+            const matchesSearch = globalFilter === '' ||
+                item.fullname.toLowerCase().includes(globalFilter.toLowerCase()) ||
+                item.walletAddress.toLowerCase().includes(globalFilter.toLowerCase()) ||
+                item.stablecoin_type.toLowerCase().includes(globalFilter.toLowerCase());
+
+            // Date filter
+            let matchesDate = true;
+            if (selectedDateRange !== 'all' && item.payday) {
+                const paydayDate = new Date(item.payday);
+                if (selectedDateRange === 'today') {
+                    matchesDate = isSameDay(paydayDate, now);
+                } else if (selectedDateRange === '7days') {
+                    const diff = (now - paydayDate) / (1000 * 60 * 60 * 24);
+                    matchesDate = diff >= 0 && diff < 7 && paydayDate <= now;
+                } else if (selectedDateRange === '30days') {
+                    const diff = (now - paydayDate) / (1000 * 60 * 60 * 24);
+                    matchesDate = diff >= 0 && diff < 30 && paydayDate <= now;
+                }
+            }
+
+            return matchesStatus && matchesStablecoin && matchesSearch && matchesDate;
+        });
+    }, [payrolls, selectedStatus, selectedStablecoin, globalFilter, selectedDateRange]);
 
     // Memoized columns for payroll (updated fields)
     const columns = useMemo(
@@ -46,6 +189,16 @@ const PayrollTable = () => {
             {
                 accessorKey: 'dob',
                 header: 'Date of Birth',
+                cell: ({ getValue }) => (
+                    <span className="text-sm font-light text-zinc-900 sm:text-base font-lexend">
+                        {getValue()}
+                    </span>
+                ),
+                filterFn: 'includesString',
+            },
+            {
+                accessorKey: 'payday',
+                header: 'Payday',
                 cell: ({ getValue }) => (
                     <span className="text-sm font-light text-zinc-900 sm:text-base font-lexend">
                         {getValue()}
@@ -75,36 +228,37 @@ const PayrollTable = () => {
                 filterFn: 'includesString',
             },
             {
-                accessorKey: 'amount',
+                id: 'amount_combined',
                 header: 'Amount',
-                cell: ({ getValue }) => (
-                    <span className="text-sm font-light text-zinc-900 sm:text-base font-lexend">
-                        {typeof getValue() === 'number' ? getValue().toLocaleString('vi-VN') : ''}
-                    </span>
-                ),
+                accessorFn: row => row, // pass full row
+                cell: ({ row }) => {
+                    const amount = row.original.amount;
+                    const stablecoin = row.original.stablecoin_type;
+                    return (
+                        <span className="text-sm font-light text-zinc-900 sm:text-base font-lexend">
+                            {typeof amount === 'number' ? amount.toLocaleString('vi-VN') : ''} {stablecoin}
+                        </span>
+                    );
+                },
                 filterFn: 'includesString',
             },
             {
-                accessorKey: 'stablecoin_type',
-                header: 'Stablecoin',
-                cell: ({ getValue }) => (
-                    <span className="text-sm font-light text-zinc-900 sm:text-base font-lexend">
-                        {getValue()}
-                    </span>
-                ),
-                filterFn: 'includesString',
-            },
-            {
-                accessorKey: 'Status',
+                accessorKey: 'status',
                 header: 'Status',
-                cell: ({ getValue }) => (
-                    <div
-                        className={`px-2 py-[3px] rounded text-xs font-light font-lexend inline-block ${getValue() === 'Approved' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'
-                            }`}
-                    >
-                        {getValue()}
-                    </div>
-                ),
+                cell: ({ getValue }) => {
+                    const value = getValue();
+                    let colorClass = 'bg-yellow-500/10 text-yellow-500';
+                    if (value === STATUS_APPROVED) colorClass = 'bg-green-500/10 text-green-500';
+                    else if (value === STATUS_PAID) colorClass = 'bg-blue-500/10 text-blue-500';
+                    else if (value === STATUS_REJECTED) colorClass = 'bg-red-500/10 text-red-500';
+                    return (
+                        <div
+                            className={`px-2 py-[3px] rounded text-xs font-light font-lexend inline-block ${colorClass}`}
+                        >
+                            {value}
+                        </div>
+                    );
+                },
                 filterFn: 'includesString',
             },
             {
@@ -115,12 +269,12 @@ const PayrollTable = () => {
                 cell: ({ row }) => (
                     <div className="flex gap-2.5">
                         <button
-                            className={`px-3 py-1 rounded text-sm font-light font-lexend ${row.original.Status === 'Approved'
-                                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                            className={`px-3 py-1 rounded text-sm font-light font-lexend ${row.original.status === STATUS_APPROVED || row.original.status === STATUS_PAID
+                                ? 'bg-gray-200 text-gray-500 cursor-not-allowed disabled'
                                 : 'bg-indigo-500 text-white hover:bg-indigo-600'
                                 }`}
-                            disabled={row.original.Status === 'Approved'}
-                            onClick={() => console.log(`Approve ${row.original.fullname}`)} // Replace with actual approve logic
+                            disabled={row.original.status === STATUS_APPROVED || row.original.status === STATUS_PAID}
+                            onClick={() => handleApprove(row.original.id)}
                         >
                             Approve
                         </button>
@@ -128,7 +282,7 @@ const PayrollTable = () => {
                 ),
             },
         ],
-        []
+        [handleApprove]
     );
 
     const table = useReactTable({
@@ -163,6 +317,61 @@ const PayrollTable = () => {
                 </div>
             </div>
 
+            {/* Filters */}
+            <div className="p-4 mb-6 border border-gray-200 rounded-lg bg-gray-50">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
+                    {/* Status Filter */}
+                    <select
+                        value={selectedStatus}
+                        onChange={(e) => setSelectedStatus(e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-lexend"
+                    >
+                        <option value="all">All Status</option>
+                        <option value={STATUS_PENDING}>Pending</option>
+                        <option value={STATUS_APPROVED}>Approved</option>
+                        <option value={STATUS_PAID}>Paid</option>
+                        <option value={STATUS_REJECTED}>Rejected</option>
+                    </select>
+
+                    {/* Stablecoin Filter */}
+                    <select
+                        value={selectedStablecoin}
+                        onChange={(e) => setSelectedStablecoin(e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-lexend"
+                    >
+                        <option value="all">All Stablecoin</option>
+                        <option value="USDT">USDT</option>
+                        <option value="USDC">USDC</option>
+                        <option value="DAI">DAI</option>
+                    </select>
+
+                    {/* Date Range Filter */}
+                    <select
+                        value={selectedDateRange}
+                        onChange={e => setSelectedDateRange(e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-lexend"
+                    >
+                        <option value="all">All Time</option>
+                        <option value="today">Today</option>
+                        <option value="7days">Last 7 Days</option>
+                        <option value="30days">Last 30 Days</option>
+                    </select>
+
+                    {/* Clear Filters */}
+                    <button
+                        onClick={() => {
+                            setGlobalFilter('');
+                            setSelectedStatus('all');
+                            setSelectedStablecoin('all');
+                            setSelectedDateRange('all');
+                        }}
+                        className="px-4 py-2 text-gray-600 transition-colors border border-gray-300 rounded-lg hover:bg-gray-50 font-lexend"
+                    >
+                        Clear Filters
+                    </button>
+                </div>
+            </div>
+
             {/* Table Container */}
             <div className="overflow-x-auto">
                 <table className="w-full min-w-[640px]">
@@ -175,7 +384,7 @@ const PayrollTable = () => {
                                         className={`px-2 sm:px-4 py-2.5 text-left text-zinc-900 text-sm sm:text-base font-semibold font-lexend ${index === 1 ? 'hidden sm:table-cell' : // CTC
                                             index === 2 ? 'hidden md:table-cell' : // Salary/Month
                                                 index === 3 ? 'hidden lg:table-cell' : // Deduction
-                                                    index === 4 ? 'hidden md:table-cell' : // Status
+                                                    index === 4 ? 'hidden md:table-cell' : // status
                                                         ''
                                             }`}
                                     >
@@ -194,7 +403,7 @@ const PayrollTable = () => {
                                         className={`px-2 sm:px-4 py-2.5 ${index === 1 ? 'hidden sm:table-cell' : // CTC
                                             index === 2 ? 'hidden md:table-cell' : // Salary/Month
                                                 index === 3 ? 'hidden lg:table-cell' : // Deduction
-                                                    index === 4 ? 'hidden md:table-cell' : // Status
+                                                    index === 4 ? 'hidden md:table-cell' : // status
                                                         ''
                                             }`}
                                     >
