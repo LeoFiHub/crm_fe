@@ -7,7 +7,7 @@ import Header from '../../components/Header';
 import WalletBalance from '../../components/wallet/WalletBalance';
 import { useAuth } from '../../contexts/AuthContext';
 import { mockPayrollSchedule, mockCompanyWallet } from '../../utils/mockData';
-import { getPayrollsByStatus } from '../../api/payroll';
+import { getPayrolls, getPayrollsByStatus } from '../../api/payroll';
 import { getEmployees } from '../../api/user';
 
 const AccountingDashboard = () => {
@@ -16,6 +16,7 @@ const AccountingDashboard = () => {
     const { user: currentUser, logout } = useAuth();
     const [pendingPayrolls, setPendingPayrolls] = useState([]);
     const [employees, setEmployees] = useState([]);
+    const [allPayrolls, setAllPayrolls] = useState([]);
 
     const handleLogout = () => {
         logout();
@@ -32,7 +33,18 @@ const AccountingDashboard = () => {
         fetchData();
     }, []);
 
-    // Get all employees
+    // Get all payrolls
+    useEffect(() => {
+        const fetchData = async () => {
+            const all = await getPayrolls();
+            setAllPayrolls(all.data.data);
+        };
+        fetchData();
+    }, []);
+
+    console.log("All Payrolls:",allPayrolls);
+
+    // Get pending payrolls
     useEffect(() => {
         const fetchData = async () => {
             const pending = await getPayrollsByStatus('pending');
@@ -41,6 +53,7 @@ const AccountingDashboard = () => {
         fetchData();
     }, []);
 
+    // Get all employees
     useEffect(() => {
         const fetchData = async () => {
             const employees = await getEmployees();
@@ -78,14 +91,14 @@ const AccountingDashboard = () => {
             color: 'text-blue-600',
             bgColor: 'bg-blue-50'
         },
-        {
-            icon: Activity,
-            title: 'Transaction History',
-            description: 'View all transactions',
-            onClick: () => navigate('/accounting/transactions'),
-            color: 'text-purple-600',
-            bgColor: 'bg-purple-50'
-        }
+        // {
+        //     icon: Activity,
+        //     title: 'Transaction History',
+        //     description: 'View all transactions',
+        //     onClick: () => navigate('/accounting/transactions'),
+        //     color: 'text-purple-600',
+        //     bgColor: 'bg-purple-50'
+        // }
     ];
 
     return (
@@ -263,7 +276,7 @@ const AccountingDashboard = () => {
                                 Quick Actions
                             </h2>
 
-                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                                 {quickActions.map((action, index) => (
                                     <button
                                         key={index}
@@ -291,7 +304,7 @@ const AccountingDashboard = () => {
                         </div>
 
                         {/* Recent Transactions */}
-                        <div className="p-6 bg-white border border-gray-200 rounded-lg">
+                        {/* <div className="p-6 bg-white border border-gray-200 rounded-lg">
                             <div className="flex items-center justify-between mb-4">
                                 <h2 className="text-xl font-semibold text-zinc-900 font-lexend">
                                     Recent Transactions
@@ -335,7 +348,7 @@ const AccountingDashboard = () => {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>
