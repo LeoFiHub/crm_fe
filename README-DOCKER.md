@@ -37,8 +37,9 @@ docker-compose down
 ```
 
 **Truy cập ứng dụng:**
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:3000
+
+- Frontend: <http://localhost:5173>
+- Backend API: <http://localhost:3000>
 - Database: localhost:3306
 
 ### 3. Chạy môi trường Production
@@ -52,8 +53,9 @@ docker-compose -f docker-compose.prod.yml up --build -d
 ```
 
 **Truy cập production:**
-- Frontend: http://localhost (port 80)
-- Backend API: http://localhost:3000
+
+- Frontend: <http://localhost> (port 80)
+- Backend API: <http://localhost:3000>
 
 ## 🛠️ Các lệnh Docker hữu ích
 
