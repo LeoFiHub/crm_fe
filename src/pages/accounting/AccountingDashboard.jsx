@@ -1,11 +1,23 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Users, Wallet, CreditCard, Activity, LogOut, TrendingUp, DollarSign } from 'lucide-react';
-
-import Sidebar from '../../components/Sidebar';
-import Header from '../../components/Header';
-import WalletBalance from '../../components/wallet/WalletBalance';
-import { getCurrentUser, logout, mockPayrollSchedule, mockCompanyWallet } from '../../utils/mockData';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+    Users,
+    Wallet,
+    CreditCard,
+    Activity,
+    LogOut,
+    TrendingUp,
+    DollarSign,
+} from "lucide-react";
+import Sidebar from "../../components/Sidebar";
+import Header from "../../components/Header";
+import WalletBalance from "../../components/wallet/WalletBalance";
+import {
+    getCurrentUser,
+    logout,
+    mockPayrollSchedule,
+    mockCompanyWallet,
+} from "../../utils/mockData";
 
 const AccountingDashboard = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -14,53 +26,58 @@ const AccountingDashboard = () => {
 
     const handleLogout = () => {
         logout();
-        navigate('/login');
+        navigate("/login");
     };
 
-    if (!currentUser || currentUser.roles !== 'accounting') {
-        navigate('/login');
+    if (!currentUser || currentUser.roles !== "accounting") {
+        navigate("/login");
         return null;
     }
 
     // Calculate stats from mock data
-    const pendingPayrolls = mockPayrollSchedule.filter(p => p.status === 'pending');
-    const totalPendingAmount = pendingPayrolls.reduce((sum, p) => sum + p.amount, 0);
+    const pendingPayrolls = mockPayrollSchedule.filter(
+        (p) => p.status === "pending"
+    );
+    const totalPendingAmount = pendingPayrolls.reduce(
+        (sum, p) => sum + p.amount,
+        0
+    );
     const totalEmployees = 4; // Mock number
 
     const quickActions = [
         {
             icon: Users,
-            title: 'Payroll Approval',
+            title: "Payroll Approval",
             description: `${pendingPayrolls.length} pending approvals`,
-            onClick: () => navigate('/accounting/payroll-approval'),
-            color: 'text-orange-600',
-            bgColor: 'bg-orange-50',
-            badge: pendingPayrolls.length
+            onClick: () => navigate("/accounting/payroll-approval"),
+            color: "text-orange-600",
+            bgColor: "bg-orange-50",
+            badge: pendingPayrolls.length,
         },
         {
             icon: CreditCard,
-            title: 'Deposit Funds',
-            description: 'Add funds to company wallet',
-            onClick: () => navigate('/accounting/deposit'),
-            color: 'text-green-600',
-            bgColor: 'bg-green-50'
+            title: "Deposit Funds",
+            description: "Add funds to company wallet",
+            onClick: () => navigate("/accounting/deposit"),
+            color: "text-green-600",
+            bgColor: "bg-green-50",
         },
         {
             icon: Wallet,
-            title: 'Company Wallet',
-            description: 'Manage company crypto wallet',
-            onClick: () => navigate('/accounting/company-wallet'),
-            color: 'text-blue-600',
-            bgColor: 'bg-blue-50'
+            title: "Company Wallet",
+            description: "Manage company crypto wallet",
+            onClick: () => navigate("/accounting/company-wallet"),
+            color: "text-blue-600",
+            bgColor: "bg-blue-50",
         },
         {
             icon: Activity,
-            title: 'Transaction History',
-            description: 'View all transactions',
-            onClick: () => navigate('/accounting/transactions'),
-            color: 'text-purple-600',
-            bgColor: 'bg-purple-50'
-        }
+            title: "Transaction History",
+            description: "View all transactions",
+            onClick: () => navigate("/accounting/transactions"),
+            color: "text-purple-600",
+            bgColor: "bg-purple-50",
+        },
     ];
 
     return (
@@ -131,7 +148,8 @@ const AccountingDashboard = () => {
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <div className="text-2xl font-bold text-green-600 font-lexend">
-                                            ${totalPendingAmount.toLocaleString()}
+                                            $
+                                            {totalPendingAmount.toLocaleString()}
                                         </div>
                                         <div className="text-sm text-gray-600 font-lexend">
                                             Pending Amount
@@ -145,7 +163,8 @@ const AccountingDashboard = () => {
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <div className="text-2xl font-bold text-purple-600 font-lexend">
-                                            ${mockCompanyWallet.totalValueUSD.toLocaleString()}
+                                            $
+                                            {mockCompanyWallet.totalValueUSD.toLocaleString()}
                                         </div>
                                         <div className="text-sm text-gray-600 font-lexend">
                                             Company Balance
@@ -166,14 +185,23 @@ const AccountingDashboard = () => {
 
                                 <div className="p-6 bg-white border border-gray-200 rounded-lg">
                                     <div className="flex items-center justify-between mb-4">
-                                        <h3 className="font-semibold text-gray-900 font-lexend">Balance Overview</h3>
+                                        <h3 className="font-semibold text-gray-900 font-lexend">
+                                            Balance Overview
+                                        </h3>
                                         <Wallet className="w-5 h-5 text-gray-500" />
                                     </div>
 
                                     <div className="space-y-3">
-                                        {Object.entries(mockCompanyWallet.balances).map(([currency, amount]) => (
-                                            <div key={currency} className="flex items-center justify-between">
-                                                <span className="text-gray-600 font-lexend">{currency}</span>
+                                        {Object.entries(
+                                            mockCompanyWallet.balances
+                                        ).map(([currency, amount]) => (
+                                            <div
+                                                key={currency}
+                                                className="flex items-center justify-between"
+                                            >
+                                                <span className="text-gray-600 font-lexend">
+                                                    {currency}
+                                                </span>
                                                 <span className="font-semibold text-gray-900 font-lexend">
                                                     {amount}
                                                 </span>
@@ -183,9 +211,12 @@ const AccountingDashboard = () => {
 
                                     <div className="pt-4 mt-4 border-t border-gray-200">
                                         <div className="flex items-center justify-between">
-                                            <span className="font-medium text-gray-900 font-lexend">Total Value</span>
+                                            <span className="font-medium text-gray-900 font-lexend">
+                                                Total Value
+                                            </span>
                                             <span className="text-xl font-bold text-green-600 font-lexend">
-                                                ${mockCompanyWallet.totalValueUSD.toLocaleString()}
+                                                $
+                                                {mockCompanyWallet.totalValueUSD.toLocaleString()}
                                             </span>
                                         </div>
                                     </div>
@@ -200,34 +231,51 @@ const AccountingDashboard = () => {
 
                                 <div className="p-6 bg-white border border-gray-200 rounded-lg">
                                     <div className="space-y-4">
-                                        {pendingPayrolls.slice(0, 3).map((payroll) => (
-                                            <div key={payroll.id} className="flex items-center gap-3 p-3 rounded-lg bg-orange-50">
-                                                {/* <img
+                                        {pendingPayrolls
+                                            .slice(0, 3)
+                                            .map((payroll) => (
+                                                <div
+                                                    key={payroll.id}
+                                                    className="flex items-center gap-3 p-3 rounded-lg bg-orange-50"
+                                                >
+                                                    {/* <img
                                                     src={payroll.employee_avatar}
                                                     alt={payroll.employee_name}
                                                     className="object-cover w-10 h-10 rounded-full"
                                                 /> */}
-                                                <div className="flex-1">
-                                                    <div className="font-medium text-gray-900 font-lexend">
-                                                        {payroll.employee_name}
+                                                    <div className="flex-1">
+                                                        <div className="font-medium text-gray-900 font-lexend">
+                                                            {
+                                                                payroll.employee_name
+                                                            }
+                                                        </div>
+                                                        <div className="text-sm text-gray-500 font-lexend">
+                                                            $
+                                                            {payroll.amount.toLocaleString()}{" "}
+                                                            {
+                                                                payroll.stablecoin_type
+                                                            }
+                                                        </div>
                                                     </div>
-                                                    <div className="text-sm text-gray-500 font-lexend">
-                                                        ${payroll.amount.toLocaleString()} {payroll.stablecoin_type}
+                                                    <div className="text-sm text-orange-600 font-lexend">
+                                                        {payroll.payday}
                                                     </div>
                                                 </div>
-                                                <div className="text-sm text-orange-600 font-lexend">
-                                                    {payroll.payday}
-                                                </div>
-                                            </div>
-                                        ))}
+                                            ))}
 
                                         {pendingPayrolls.length > 3 && (
                                             <div className="text-center">
                                                 <button
-                                                    onClick={() => navigate('/accounting/payroll-approval')}
+                                                    onClick={() =>
+                                                        navigate(
+                                                            "/accounting/payroll-approval"
+                                                        )
+                                                    }
                                                     className="text-sm text-indigo-600 font-lexend hover:underline"
                                                 >
-                                                    View all {pendingPayrolls.length} pending payrolls
+                                                    View all{" "}
+                                                    {pendingPayrolls.length}{" "}
+                                                    pending payrolls
                                                 </button>
                                             </div>
                                         )}
@@ -255,8 +303,12 @@ const AccountingDashboard = () => {
                                             </div>
                                         )}
 
-                                        <div className={`w-12 h-12 ${action.bgColor} rounded-lg flex items-center justify-center mb-4`}>
-                                            <action.icon className={`w-6 h-6 ${action.color}`} />
+                                        <div
+                                            className={`w-12 h-12 ${action.bgColor} rounded-lg flex items-center justify-center mb-4`}
+                                        >
+                                            <action.icon
+                                                className={`w-6 h-6 ${action.color}`}
+                                            />
                                         </div>
                                         <h3 className="mb-2 font-semibold text-gray-900 font-lexend">
                                             {action.title}
@@ -276,7 +328,9 @@ const AccountingDashboard = () => {
                                     Recent Transactions
                                 </h2>
                                 <button
-                                    onClick={() => navigate('/accounting/transactions')}
+                                    onClick={() =>
+                                        navigate("/accounting/transactions")
+                                    }
                                     className="text-sm text-indigo-600 font-lexend hover:underline"
                                 >
                                     View All

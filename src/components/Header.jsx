@@ -1,12 +1,13 @@
-import { Search, Bell, ChevronDown, Menu } from 'lucide-react';
-import WalletConnector from './wallet/WalletConnector';
-import WalletDebugComponent from './wallet/WalletDebugComponent';
+import { Search, Bell, ChevronDown, Menu } from "lucide-react";
+import WalletConnector from "./wallet/WalletConnector";
+import WalletDebugComponent from "./wallet/WalletDebugComponent";
+import { WalletSelector } from "./wallet/WalletSelector";
 
 const Header = ({
     userName = "Robert Allen",
     userRole = "Accounting Manager",
     greeting = "Good Morning",
-    onMenuClick
+    onMenuClick,
 }) => {
     return (
         <div className="w-full px-4 py-4 bg-white border-b border-zinc-400/20 sm:px-6">
@@ -24,7 +25,7 @@ const Header = ({
                     {/* Greeting */}
                     <div className="flex flex-col">
                         <div className="text-lg font-semibold leading-loose text-zinc-900 sm:text-xl font-lexend">
-                            Hello {userName.split(' ')[0]} 👋🏻
+                            Hello {userName.split(" ")[0]} 👋🏻
                         </div>
                         <div className="text-xs font-light leading-snug text-zinc-400 sm:text-sm font-lexend">
                             {greeting}
@@ -55,7 +56,7 @@ const Header = ({
                     </button>
 
                     {/* Wallet Connection */}
-                    <WalletConnector className="flex-shrink-0" />
+                    <WalletSelector className="flex-shrink-0" />
 
                     {/* User Profile */}
                     <div className="flex items-center gap-2 p-2 transition-colors border rounded-lg sm:gap-3 border-zinc-400/20 hover:bg-gray-50">
