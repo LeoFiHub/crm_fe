@@ -1,49 +1,129 @@
 import { useState } from 'react';
-import { User, Calendar, FolderOpen, FileText, Edit, Briefcase } from 'lucide-react';
+import { User, Calendar, Edit, X, Save } from 'lucide-react';
+import InputField from '../Form/InputField';
+import SelectField from '../Form/SelectField';
+import { updateProfile } from '../../api/user';
+import { toast } from 'react-toastify';
+import { useAuth } from '../../contexts/AuthContext';
+
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
+
+const employeeSchema = Yup.object().shape({
+    fullName: Yup.string().required('Full name is required'),
+    email: Yup.string().email('Invalid email format').required('Email is required'),
+    phoneNumber: Yup.string().required('Phone number is required'),
+    dateOfBirth: Yup.date().required('Date of birth is required'),
+    gender: Yup.string().required('Gender is required'),
+    walletAddress: Yup.string().required('Wallet address is required'),
+    address: Yup.string().required('Address is required')
+});
 
 export const ProfileEmp = ({ employeeData }) => {
-    const [activeTab, setActiveTab] = useState(0);
+    const [activeTab, _setActiveTab] = useState(0);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const { updateUser } = useAuth(); // Lấy hàm updateUser từ AuthContext
 
-    // Sample employee data - bạn có thể truyền từ props
-    const defaultEmployeeData = {
-        firstName: 'Brooklyn',
-        lastName: 'Simmons',
-        email: 'brooklyn.s@example.com',
-        position: 'Project Manager',
-        mobile: '(702) 555-0122',
-        dateOfBirth: 'July 14, 1995',
-        maritalStatus: 'Married',
-        gender: 'Female',
-        nationality: 'America',
-        address: '2464 Royal Ln. Mesa, New Jersey',
-        city: 'California',
-        state: 'United State',
-        zipCode: '35624',
-        avatar: 'https://placehold.co/100x100'
+    const employee = employeeData;
+
+    // react-hook-form with yup validation
+    // Helper để viết hoa chữ cái đầu
+    const capitalizeFirstLetter = (str) => {
+        if (!str) return '';
+        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
     };
 
-    const employee = employeeData || defaultEmployeeData;
+    const empEditForm = useForm({
+        resolver: yupResolver(employeeSchema),
+        mode: 'all',
+        reValidateMode: 'onChange',
+        defaultValues: {
+            fullName: employee?.fullName || '',
+            email: employee?.email || '',
+            phoneNumber: employee?.phoneNumber || '',
+            dateOfBirth: employee?.dateOfBirth ? new Date(employee.dateOfBirth).toISOString().split('T')[0] : '',
+            gender: capitalizeFirstLetter(employee?.gender),
+            walletAddress: employee?.walletAddress || '',
+            address: employee?.address || ''
+        },
+    });
 
-    const tabs = [
-        { id: 0, name: 'Profile', icon: User, active: true },
-        { id: 1, name: 'Attendance', icon: Calendar, active: false },
-        { id: 2, name: 'Projects', icon: FolderOpen, active: false },
-        { id: 3, name: 'Leave', icon: FileText, active: false }
-    ];
+    // Handle opening edit modal
+    const handleEditClick = () => {
+        // Reset form with current employee data, chuyển gender sang chữ hoa đầu
+        empEditForm.reset({
+            fullName: employee?.fullName || '',
+            email: employee?.email || '',
+            phoneNumber: employee?.phoneNumber || '',
+            dateOfBirth: employee?.dateOfBirth
+                ? new Date(employee.dateOfBirth).toISOString().split('T')[0]
+                : '',
+            gender: capitalizeFirstLetter(employee?.gender),
+            walletAddress: employee?.walletAddress || '',
+            address: employee?.address || ''
+        });
+        setIsEditModalOpen(true);
+    };
 
+    // Handle closing edit modal
+    const handleCloseModal = () => {
+        setIsEditModalOpen(false);
+        empEditForm.reset();
+    };
+
+    // Handle save changes using react-hook-form
+    const onSubmit = async (data) => {
+        // Chuyển gender về chữ thường khi submit
+        const submitData = {
+            ...data,
+            gender: data.gender.toLowerCase(),
+        };
+        console.log('Saving changes:', submitData);
+        try {
+            await updateProfile(submitData);
+
+            // Cập nhật dữ liệu user trong AuthContext và localStorage
+            const updatedUserData = {
+                ...employee,
+                ...submitData,
+                gender: data.gender.toLowerCase()
+            };
+            updateUser(updatedUserData);
+
+            toast.success('Employee updated successfully');
+            handleCloseModal();
+
+            // Force re-render bằng cách reload trang (tùy chọn)
+            // window.location.reload();
+        } catch (error) {
+            toast.error('Error updating employee');
+            console.error('Error updating employee:', error);
+        }
+    };
+
+    // Move InfoField and personalInfoFields inside the component
     const personalInfoFields = [
-        { label: 'First Name', value: employee.firstName },
-        { label: 'Last Name', value: employee.lastName },
-        { label: 'Mobile Number', value: employee.mobile },
+        // { label: 'First Name', value: employee.firstName },
+        // { label: 'Last Name', value: employee.lastName },
+        { label: 'Full name', value: employee.fullName },
+        { label: 'Mobile Number', value: employee.phoneNumber },
         { label: 'Email Address', value: employee.email },
-        { label: 'Date of Birth', value: employee.dateOfBirth },
-        { label: 'Marital Status', value: employee.maritalStatus },
-        { label: 'Gender', value: employee.gender },
-        { label: 'Nationality', value: employee.nationality },
+        {
+            label: 'Date of Birth', value: employee.dateOfBirth
+                ? (typeof employee.dateOfBirth === 'string'
+                    ? new Date(employee.dateOfBirth).toISOString().split('T')[0]
+                    : employee.dateOfBirth.toISOString().split('T')[0])
+                : ''
+        },
+        // { label: 'Marital Status', value: employee.maritalStatus },
+        { label: 'Gender', value: capitalizeFirstLetter(employee.gender) },
+        // { label: 'Nationality', value: employee.nationality },
+        { label: 'Wallet Address', value: employee.walletAddress },
         { label: 'Address', value: employee.address },
-        { label: 'City', value: employee.city },
-        { label: 'State', value: employee.state },
-        { label: 'Zip Code', value: employee.zipCode }
+        // { label: 'City', value: employee.city },
+        // { label: 'State', value: employee.state },
+        // { label: 'Zip Code', value: employee.zipCode }
     ];
 
     const InfoField = ({ label, value }) => (
@@ -59,64 +139,31 @@ export const ProfileEmp = ({ employeeData }) => {
             <div className="w-full h-px bg-zinc-400/10" />
         </div>
     );
+
     return (
         <div className="flex gap-6 p-6">
-            {/* Sidebar nhỏ */}
-            <div className="relative flex-shrink-0 h-56 w-60">
-                <div className="w-full h-full rounded-[10px] border border-zinc-400/20 bg-white">
-                    {/* Header */}
-                    <div className="w-full h-14 bg-indigo-500 rounded-tl-[10px] rounded-tr-[10px] flex items-center px-5">
-                        <div className="flex items-center gap-2.5">
-                            <User className="w-6 h-6 text-white" />
-                            <div className="text-base font-semibold text-white font-lexend">
-                                Profile
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Menu Items */}
-                    <div className="p-5 space-y-4">
-                        {tabs.slice(1).map((tab) => {
-                            const Icon = tab.icon;
-                            return (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setActiveTab(tab.id)}
-                                    className="flex items-center gap-2.5 w-full text-left hover:opacity-70 transition-opacity"
-                                >
-                                    <Icon className="w-6 h-6 text-zinc-900" />
-                                    <div className="text-base font-light text-zinc-900 font-lexend">
-                                        {tab.name}
-                                    </div>
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
-            </div>
-
             {/* Nội dung chính */}
             <div className="flex flex-col flex-1 gap-7">
                 {/* Header */}
                 <div className="flex flex-col gap-7">
                     <div className="flex items-end justify-between w-full">
                         <div className="flex items-start gap-4">
-                            <img
-                                className="w-24 h-24 rounded-[10px] object-cover"
-                                src={employee.avatar}
-                                alt={`${employee.firstName} ${employee.lastName}`}
-                            />
+                            {/* <img
+                                    className="w-24 h-24 rounded-[10px] object-cover"
+                                    src={employee.avatar}
+                                    alt={`${employee.firstName} ${employee.lastName}`}
+                                /> */}
                             <div className="flex flex-col gap-2">
                                 <div className="text-2xl font-semibold text-zinc-900 font-lexend">
-                                    {employee.firstName} {employee.lastName}
+                                    {employee.fullName}
                                 </div>
                                 <div className="flex flex-col gap-2">
-                                    <div className="flex items-center gap-2.5">
-                                        <Briefcase className="w-6 h-6 text-zinc-900" />
-                                        <div className="text-base font-light text-zinc-900 font-lexend">
-                                            {employee.position}
-                                        </div>
-                                    </div>
+                                    {/* <div className="flex items-center gap-2.5">
+                                            <Briefcase className="w-6 h-6 text-zinc-900" />
+                                            <div className="text-base font-light text-zinc-900 font-lexend">
+                                                {employee.position}
+                                            </div>
+                                        </div> */}
                                     <div className="flex items-center gap-2.5">
                                         <Calendar className="w-6 h-6 text-zinc-900" />
                                         <div className="text-base font-light text-zinc-900 font-lexend">
@@ -126,7 +173,10 @@ export const ProfileEmp = ({ employeeData }) => {
                                 </div>
                             </div>
                         </div>
-                        <button className="h-12 px-5 bg-indigo-500 rounded-[10px] flex items-center gap-2.5 hover:bg-indigo-600 transition-colors">
+                        <button
+                            className="h-12 px-5 bg-indigo-500 rounded-[10px] flex items-center gap-2.5 hover:bg-indigo-600 transition-colors"
+                            onClick={handleEditClick}
+                        >
                             <Edit className="w-6 h-6 text-white" />
                             <div className="text-base font-light text-white font-lexend">
                                 Edit Profile
@@ -157,43 +207,153 @@ export const ProfileEmp = ({ employeeData }) => {
                     </div>
                 )}
 
-                {/* Other tabs placeholder */}
-                {activeTab === 1 && (
-                    <div className="py-20 text-center">
-                        <Calendar className="w-16 h-16 mx-auto mb-4 text-zinc-400" />
-                        <h3 className="mb-2 text-xl font-semibold text-zinc-900 font-lexend">
-                            Attendance
-                        </h3>
-                        <p className="text-zinc-400 font-lexend">
-                            Attendance information will be displayed here
-                        </p>
-                    </div>
-                )}
 
-                {activeTab === 2 && (
-                    <div className="py-20 text-center">
-                        <FolderOpen className="w-16 h-16 mx-auto mb-4 text-zinc-400" />
-                        <h3 className="mb-2 text-xl font-semibold text-zinc-900 font-lexend">
-                            Projects
-                        </h3>
-                        <p className="text-zinc-400 font-lexend">
-                            Project information will be displayed here
-                        </p>
-                    </div>
-                )}
-
-                {activeTab === 3 && (
-                    <div className="py-20 text-center">
-                        <FileText className="w-16 h-16 mx-auto mb-4 text-zinc-400" />
-                        <h3 className="mb-2 text-xl font-semibold text-zinc-900 font-lexend">
-                            Leave
-                        </h3>
-                        <p className="text-zinc-400 font-lexend">
-                            Leave information will be displayed here
-                        </p>
-                    </div>
-                )}
             </div>
+
+            {/* Edit Profile Modal */}
+            {isEditModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white rounded-[20px] w-full max-w-2xl max-h-[90vh] overflow-y-auto mx-4">
+                        {/* Modal Header */}
+                        <div className="flex items-center justify-between p-6 border-b border-zinc-400/20">
+                            <div className="flex items-center gap-2.5">
+                                <Edit className="w-6 h-6 text-indigo-500" />
+                                <h2 className="text-xl font-semibold text-zinc-900 font-lexend">
+                                    Edit Profile
+                                </h2>
+                            </div>
+                            <button
+                                onClick={handleCloseModal}
+                                className="p-2 transition-colors rounded-full hover:bg-gray-100"
+                            >
+                                <X className="w-5 h-5 text-zinc-900" />
+                            </button>
+                        </div>
+
+                        {/* Modal Body */}
+                        <form onSubmit={empEditForm.handleSubmit(onSubmit)}>
+                            <div className="p-6">
+                                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                    {/* Full Name */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-sm font-light text-zinc-400 font-lexend">
+                                            Full Name
+                                        </label>
+                                        <InputField
+                                            type="text"
+                                            placeholder="Enter full name"
+                                            {...empEditForm.register('fullName')}
+                                            error={empEditForm.formState.errors.fullName?.message}
+                                        />
+                                    </div>
+
+                                    {/* Email */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-sm font-light text-zinc-400 font-lexend">
+                                            Email Address
+                                        </label>
+                                        <InputField
+                                            type="email"
+                                            placeholder="Enter email address"
+                                            {...empEditForm.register('email')}
+                                            error={empEditForm.formState.errors.email?.message}
+                                        />
+                                    </div>
+
+                                    {/* Mobile */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-sm font-light text-zinc-400 font-lexend">
+                                            Mobile Number
+                                        </label>
+                                        <InputField
+                                            type="tel"
+                                            placeholder="Enter phone number"
+                                            {...empEditForm.register('phoneNumber')}
+                                            error={empEditForm.formState.errors.phoneNumber?.message}
+                                        />
+                                    </div>
+
+                                    {/* Date of Birth */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-sm font-light text-zinc-400 font-lexend">
+                                            Date of Birth
+                                        </label>
+                                        <InputField
+                                            type="date"
+                                            placeholder="Select date of birth"
+                                            {...empEditForm.register('dateOfBirth')}
+                                            error={empEditForm.formState.errors.dateOfBirth?.message}
+                                        />
+                                    </div>
+
+                                    {/* Gender */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-sm font-light text-zinc-400 font-lexend">
+                                            Gender
+                                        </label>
+                                        <SelectField
+                                            placeholder="Select gender"
+                                            {...empEditForm.register('gender')}
+                                            error={empEditForm.formState.errors.gender?.message}
+                                            options={[
+                                                { value: 'Male', label: 'Male' },
+                                                { value: 'Female', label: 'Female' },
+                                                { value: 'Other', label: 'Other' }
+                                            ]}
+                                        />
+                                    </div>
+
+                                    {/* Empty space for grid layout */}
+                                    <div></div>
+
+                                    {/* Address */}
+                                    <div className="flex flex-col gap-2 md:col-span-2">
+                                        <label className="text-sm font-light text-zinc-400 font-lexend">
+                                            Address
+                                        </label>
+                                        <InputField
+                                            placeholder="Enter address"
+                                            {...empEditForm.register('address')}
+                                            error={empEditForm.formState.errors.address?.message}
+                                        />
+                                    </div>
+
+                                    {/* Wallet Address */}
+                                    <div className="flex flex-col gap-2 md:col-span-2">
+                                        <label className="text-sm font-light text-zinc-400 font-lexend">
+                                            Wallet Address
+                                        </label>
+                                        <InputField
+                                            placeholder="Enter wallet address"
+                                            {...empEditForm.register('walletAddress')}
+                                            error={empEditForm.formState.errors.walletAddress?.message}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Modal Footer */}
+                            <div className="flex items-center justify-end gap-3 p-6 border-t border-zinc-400/20">
+                                <button
+                                    type="button"
+                                    onClick={handleCloseModal}
+                                    className="px-6 py-2.5 border border-zinc-400/20 rounded-[10px] text-sm font-light text-zinc-900 font-lexend hover:bg-gray-50 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={!empEditForm.formState.isValid}
+                                    className="px-6 py-2.5 bg-indigo-500 rounded-[10px] text-sm font-light text-white font-lexend hover:bg-indigo-600 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    <Save className="w-4 h-4" />
+                                    Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -15,29 +15,58 @@ import {
     Sun,
     Moon,
     X,
-    Menu
+    Menu,
+    Wallet,
+    History,
+    User,
+    CheckSquare
 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
     const [theme, setTheme] = useState('light');
     const navigate = useNavigate();
     const location = useLocation();
+    const { user: currentUser } = useAuth();
 
-    const menuItems = [
-        { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-        { icon: Users, label: 'All Employees', path: '/employees' },
-        { icon: DollarSign, label: 'Payroll', path: '/payroll' },
-        // UI Finance role, deposit
-        { icon: Coins, label: 'Deposit', path: '/deposit' },
-        
-        // { icon: Building2, label: 'All Departments', path: '/departments' },
-        // { icon: Clock, label: 'Attendance', path: '/attendance' },
-        // { icon: Briefcase, label: 'Jobs', path: '/jobs' },
-        // { icon: UserCheck, label: 'Candidates', path: '/candidates' },
-        // { icon: FileText, label: 'Leaves', path: '/leaves' },
-        // { icon: Calendar, label: 'Holidays', path: '/holidays' },
-        // { icon: Settings, label: 'Settings', path: '/settings' },
-    ];
+    // Define menu items based on user role
+    const getMenuItems = () => {
+        if (!currentUser) {
+            return [
+                { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' }
+            ];
+        }
+
+        if (currentUser.role === 'employee') {
+            return [
+                { icon: LayoutDashboard, label: 'Dashboard', path: '/employee/dashboard' },
+                { icon: User, label: 'My Profile', path: '/employee/profile' },
+                { icon: Wallet, label: 'My Wallet', path: '/employee/wallet' },
+                { icon: History, label: 'Salary History', path: '/employee/salary-history' }
+            ];
+        }
+
+        if (currentUser.role === 'accounting') {
+            return [
+                { icon: LayoutDashboard, label: 'Dashboard', path: '/accounting/dashboard' },
+                // { icon: Users, label: 'All Employees', path: '/employees' },
+                { icon: CheckSquare, label: 'Payroll Approval', path: '/accounting/payroll-approval' },
+                { icon: Coins, label: 'Deposit Funds', path: '/accounting/deposit' },
+                { icon: Wallet, label: 'Company Wallet', path: '/accounting/company-wallet' },
+                // { icon: History, label: 'Transactions', path: '/accounting/transactions' }
+            ];
+        }
+
+        // Default menu for other roles
+        return [
+            { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+            { icon: Users, label: 'All Employees', path: '/employees' },
+            { icon: DollarSign, label: 'Payroll', path: '/payroll' },
+            { icon: Coins, label: 'Deposit', path: '/deposit' }
+        ];
+    };
+
+    const menuItems = getMenuItems();
 
     const handleMenuClick = (path) => {
         navigate(path);
@@ -91,11 +120,12 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
             {/* Sidebar */}
             <div className={`
-                fixed top-0 left-0 z-50 lg:z-10 lg:relative
-                w-72 h-full bg-white shadow-lg lg:shadow-none
+                fixed top-0 left-0 z-50 lg:z-10 lg:sticky lg:top-0
+                w-72 h-screen bg-white shadow-lg lg:shadow-none
                 transform transition-transform duration-300 ease-in-out lg:transform-none
                 ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
                 lg:translate-x-0 lg:flex-shrink-0
+                overflow-hidden
             `}>
                 {/* Background */}
                 <div className="w-full h-full absolute bg-zinc-400/5 rounded-none lg:rounded-[20px]" />
@@ -116,12 +146,12 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                                 <span className="text-sm font-bold text-violet-500">C</span>
                             </div>
                         </div>
-                        <span className="text-lg font-semibold text-zinc-900 font-lexend">CRM</span>
+                        <span className="text-lg font-semibold text-zinc-900 font-lexend">CRM Onchain</span>
                     </div>
                 </div>
 
                 {/* Menu Items */}
-                <div className="relative z-10 flex-1 px-6 lg:px-[30px] pt-8 lg:pt-[50px] pb-24 lg:pb-[100px] overflow-y-auto">
+                <div className="relative z-10 flex-1 px-6 lg:px-[30px] pt-8 lg:pt-[50px] pb-24 lg:pb-[100px] overflow-y-auto max-h-[calc(100vh-200px)]">
                     <div className="space-y-2.5">
                         {menuItems.map((item, index) => (
                             <MenuItem key={index} {...item} />

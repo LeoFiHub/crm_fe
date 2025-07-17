@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -7,6 +6,10 @@ import * as Yup from 'yup';
 
 import InputFieldAuth from '../components/Form/InputFieldAuth';
 import InputFieldPW from '../components/Form/InputFieldPW';
+import WalletConnector from '../components/wallet/WalletConnector';
+import { authenticateUser } from '../api/auth';
+import { useAuth } from '../contexts/AuthContext';
+// import { authenticateUser } from '../utils/mockData';
 
 const loginSchema = Yup.object().shape({
     email: Yup.string().required('Email is required').email('Invalid email format'),
@@ -14,9 +17,10 @@ const loginSchema = Yup.object().shape({
 });
 
 const Login = () => {
-    const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(true);
     const navigate = useNavigate();
+    const { login } = useAuth();
+
     // Form handling
     const loginForm = useForm({
         resolver: yupResolver(loginSchema),
@@ -33,6 +37,42 @@ const Login = () => {
         const isValid = await loginForm.trigger();
         if (!isValid) return;
 
+        try {
+            // Get form values
+            const formData = loginForm.getValues();
+
+            // Authenticate user
+            const response = await authenticateUser(formData);
+            console.log("Res", response)
+            console.log(response.data.success, response.data.data)
+            if (response.data.success && response.data.data) {
+                const userData = response.data.data;
+                const token = response.data.data.token;
+
+                // Use AuthContext login method
+                login(userData, token);
+
+                // Redirect based on user role
+                if (userData.role === 'employee') {
+                    navigate('/employee/dashboard');
+                } else if (userData.role === 'accounting') {
+                    navigate('/accounting/dashboard');
+                } else {
+                    navigate('/dashboard');
+                }
+            } else {
+                // Show error message
+                alert('Invalid email or password');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            alert('Login failed. Please try again.');
+        }
+    };
+
+    const handleWalletConnect = (walletInfo) => {
+        console.log('Wallet connected:', walletInfo);
+        // For demo, just redirect to dashboard
         navigate('/dashboard');
     };
 
@@ -87,7 +127,6 @@ const Login = () => {
                             label="Email Address"
                             placeholder="robertallen@example.com"
                             type="email"
-                            defaultValues="robertallen@example.com"
                             {...loginForm.register('email')}
                             error={loginForm.formState.errors.email?.message}
                         />
@@ -132,6 +171,28 @@ const Login = () => {
                         >
                             Login
                         </button>
+
+                        {/* OR divider */}
+                        <div className="flex items-center my-6">
+                            <div className="flex-1 border-t border-gray-300"></div>
+                            <div className="mx-4 text-sm text-gray-500 font-lexend">OR</div>
+                            <div className="flex-1 border-t border-gray-300"></div>
+                        </div>
+
+                        {/* Wallet Connection */}
+                        <WalletConnector
+                            onConnect={handleWalletConnect}
+                            className="justify-center w-full"
+                        />
+
+                        {/* Demo Account Info */}
+                        <div className="p-4 mt-6 border border-blue-200 rounded-lg bg-blue-50">
+                            <h4 className="mb-2 font-semibold text-blue-800 font-lexend">Demo Accounts:</h4>
+                            <div className="space-y-1 text-sm text-blue-700 font-lexend">
+                                <div><strong>Employee:</strong> john.smith.employee@company.com / password123</div>
+                                <div><strong>Accounting:</strong> lisa.anderson.accounting@company.com / password123</div>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
