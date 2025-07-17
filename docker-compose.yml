@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # Frontend (React)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - backend
+    networks:
+      - crm-network
+
+  # Backend (Node.js - giả sử backend chạy trên port 3000)
+  backend:
+    # Thay thế bằng backend image của bạn
+    image: node:18-alpine
+    working_dir: /app
+    volumes:
+      - ../crm_be:/app  # Đường dẫn đến backend folder
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+    command: ["npm", "run", "dev"]
+    networks:
+      - crm-network
+
+  # Database (MySQL/PostgreSQL - tùy chọn)
+  database:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: crm_db
+      MYSQL_USER: crm_user
+      MYSQL_PASSWORD: crm_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - crm-network
+
+networks:
+  crm-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
