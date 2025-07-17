@@ -53,7 +53,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                 { icon: CheckSquare, label: 'Payroll Approval', path: '/accounting/payroll-approval' },
                 { icon: Coins, label: 'Deposit Funds', path: '/accounting/deposit' },
                 { icon: Wallet, label: 'Company Wallet', path: '/accounting/company-wallet' },
-                { icon: History, label: 'Transactions', path: '/accounting/transactions' }
+                // { icon: History, label: 'Transactions', path: '/accounting/transactions' }
             ];
         }
 

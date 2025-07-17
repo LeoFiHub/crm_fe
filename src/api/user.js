@@ -3,6 +3,11 @@ import axios from "axios"
 // GET: 
 // All users
 export const getUsers = () => axios.get('/api/users');
+
+// Employees
+export const getEmployees = () => axios.get('/api/users/employees', {
+    headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` }
+});
 // Detail user by ID
 export const getUserById = (id) => axios.get(`/api/users/${id}`);
 

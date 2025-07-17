@@ -29,6 +29,7 @@ export const updatePayroll = (id, payrollData) => axios.put(`/api/payrolls/${id}
 
 
 // Approve payroll by ID
-export const approvePayroll = (id) => axios.post(`/api/payrolls/approve/${id}`, {
+export const approvePayroll = (id) => axios.put(`/api/payrolls/approve/${id}`, {}, {
     headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` }
 });
+

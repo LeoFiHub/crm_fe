@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, Wallet, CreditCard, Activity, LogOut, TrendingUp, DollarSign } from 'lucide-react';
 
@@ -7,11 +7,15 @@ import Header from '../../components/Header';
 import WalletBalance from '../../components/wallet/WalletBalance';
 import { useAuth } from '../../contexts/AuthContext';
 import { mockPayrollSchedule, mockCompanyWallet } from '../../utils/mockData';
+import { getPayrollsByStatus } from '../../api/payroll';
+import { getEmployees } from '../../api/user';
 
 const AccountingDashboard = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const navigate = useNavigate();
     const { user: currentUser, logout } = useAuth();
+    const [pendingPayrolls, setPendingPayrolls] = useState([]);
+    const [employees, setEmployees] = useState([]);
 
     const handleLogout = () => {
         logout();
@@ -19,9 +23,34 @@ const AccountingDashboard = () => {
     };
 
     // Calculate stats from mock data
-    const pendingPayrolls = mockPayrollSchedule.filter(p => p.status === 'pending');
+    // const pendingPayrolls = mockPayrollSchedule.filter(p => p.status === 'pending');
+    useEffect(() => {
+        const fetchData = async () => {
+            const pending = await getPayrollsByStatus('pending');
+            setPendingPayrolls(pending.data.data);
+        };
+        fetchData();
+    }, []);
+
+    // Get all employees
+    useEffect(() => {
+        const fetchData = async () => {
+            const pending = await getPayrollsByStatus('pending');
+            setPendingPayrolls(pending.data.data);
+        };
+        fetchData();
+    }, []);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const employees = await getEmployees();
+            setEmployees(employees.data.data);
+        };
+        fetchData();
+    }, []);
+
     const totalPendingAmount = pendingPayrolls.reduce((sum, p) => sum + p.amount, 0);
-    const totalEmployees = 4; // Mock number
+    const totalEmployees = employees.length;
 
     const quickActions = [
         {
@@ -198,17 +227,13 @@ const AccountingDashboard = () => {
                                     <div className="space-y-4">
                                         {pendingPayrolls.slice(0, 3).map((payroll) => (
                                             <div key={payroll.id} className="flex items-center gap-3 p-3 rounded-lg bg-orange-50">
-                                                {/* <img
-                                                    src={payroll.employee_avatar}
-                                                    alt={payroll.employee_name}
-                                                    className="object-cover w-10 h-10 rounded-full"
-                                                /> */}
+                                                {/* Uncomment and adjust if you have employee avatar: <img src={payroll.employee?.avatar} alt={payroll.employee?.fullName} className="object-cover w-10 h-10 rounded-full" /> */}
                                                 <div className="flex-1">
                                                     <div className="font-medium text-gray-900 font-lexend">
-                                                        {payroll.employee_name}
+                                                        {payroll.employee?.fullName || ''}
                                                     </div>
                                                     <div className="text-sm text-gray-500 font-lexend">
-                                                        ${payroll.amount.toLocaleString()} {payroll.stablecoin_type}
+                                                        {payroll.amount?.toLocaleString('vi-VN')} {payroll.stablecoin_type}
                                                     </div>
                                                 </div>
                                                 <div className="text-sm text-orange-600 font-lexend">

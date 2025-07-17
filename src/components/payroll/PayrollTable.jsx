@@ -27,42 +27,34 @@ const PayrollTable = () => {
         fetchPayrolls();
     }, []);
 
-    if (payrolls) {
-        console.log(payrolls)
-    }
+
 
     // ============== Side effect ==============
     const handleApprove = useCallback(async (id) => {
         try {
-            console.log('Approve clicked for ID:', id);
-
             if (!payrolls) {
-                console.log('No payrolls data');
                 return;
             }
 
             // Lấy bản ghi payroll cần update trước khi setPayrolls
             const currentPayroll = payrolls.find(p => p.id === id);
-            console.log('Current payroll:', currentPayroll);
 
             if (!currentPayroll) {
-                console.log('Payroll not found');
                 return;
             }
 
             // Kiểm tra status từ backend (chữ thường)
             if (currentPayroll.status === 'paid' || currentPayroll.status === 'approved') {
-                console.log('Payroll already processed:', currentPayroll.status);
                 return;
             }
 
             // Tạo object để gửi API (status backend là chữ thường)
-            const updatedPayrollForAPI = {
-                ...currentPayroll,
-                status: 'approved' // Gửi chữ thường cho backend
-            };
+            // const updatedPayrollForAPI = {
+            //     ...currentPayroll,
+            //     status: 'approved' // Gửi chữ thường cho backend
+            // };
 
-            console.log('Sending to API:', updatedPayrollForAPI);
+
 
             // Gọi API approve chuyên dụng
             await approvePayroll(id);
