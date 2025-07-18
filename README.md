@@ -1,5 +1,47 @@
 # LeoLab CRM Frontend Application
 
+## 🚀 Quick Start cho User
+
+### ⚡ Cách nhanh nhất (Recommended)
+
+#### Windows
+
+1. Mở Command Prompt hoặc PowerShell
+2. Chạy: `setup.bat`
+
+#### Mac/Linux
+
+1. Mở Terminal  
+2. Chạy: `chmod +x setup.sh && ./setup.sh`
+
+### 📋 Yêu cầu hệ thống
+
+- **Docker Desktop** (bắt buộc)
+- **4GB RAM** trống
+- **Port 5173** không bị sử dụng
+
+### 🌐 Truy cập sau khi setup
+
+- **Frontend**: <http://localhost:5173>
+- **Backend cần có**: <http://localhost:3000>
+
+### 🔧 Commands hữu ích
+
+```bash
+# Xem logs
+docker-compose logs -f
+
+# Dừng
+docker-compose down
+
+# Restart
+docker-compose restart
+```
+
+---
+
+## 📖 Chi tiết kỹ thuật
+
 Ứng dụng CRM (Customer Relationship Management) được xây dựng với React.js, Tailwind CSS và Ant design.
 
 <!-- ## 🚀 Tính năng

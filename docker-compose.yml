@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  # Frontend (React) - kết nối với backend đang chạy trên host
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_API_BASE_URL=http://host.docker.internal:3000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+# Backend và Database đã chạy sẵn, không cần Docker
+# Backend: http://localhost:3000
+# Database: kết nối trực tiếp
+
+# Uncomment phần dưới nếu cần database trong Docker
+# volumes:
+#   mysql_data:
