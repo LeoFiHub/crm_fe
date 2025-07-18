@@ -2,6 +2,7 @@ import { Search, Bell, ChevronDown, Menu } from 'lucide-react';
 import WalletConnector from './wallet/WalletConnector';
 import WalletDebugComponent from './wallet/WalletDebugComponent';
 import { useAuth } from '../contexts/AuthContext';
+import { WalletSelector } from './wallet/WalletSelector';
 
 const Header = ({
     greeting = "Good Morning",
@@ -60,7 +61,7 @@ const Header = ({
                     </button>
 
                     {/* Wallet Connection */}
-                    <WalletConnector className="flex-shrink-0" />
+                    <WalletSelector className="flex-shrink-0" />
 
                     {/* User Profile */}
                     <div className="flex items-center gap-2 p-2 transition-colors border rounded-lg sm:gap-3 border-zinc-400/20 hover:bg-gray-50">
