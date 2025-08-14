@@ -18,6 +18,8 @@ import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import TestPayroll from './components/TestPayroll';
+import TestPayrollLisk from './components/TestPayrollLisk';
 
 function App() {
   return (
@@ -25,6 +27,9 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<MainLayout />}>
+            <Route path="test-payroll-aptos" element={<TestPayroll />} />
+            <Route path="test-payroll-lisk-evm" element={<TestPayrollLisk />} />
+
             <Route index element={<Navigate to="/login" replace />} />
             {/* Auth */}
             <Route path="login" element={<Login />} />
